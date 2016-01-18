@@ -7,6 +7,9 @@
 _obj
 _test
 
+# binaries
+nba
+
 # Architecture specific extensions/prefixes
 *.[568vq]
 [568vq].out
