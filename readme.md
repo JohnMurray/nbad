@@ -17,6 +17,13 @@ raising alerts.
 
 ## Solution
 
+The solution to this is to _ideally_ have smarter applications that take care of OK'ing
+alerts when a problem is gone or throttling the number of alerts that it sends when things
+are actually going wrong. This could be perhaps solved by better tooling or framework support
+for whatever the application is written in. However there are a lot of languages out there
+and even more frameworks and libraries. By solving this from an _external_ approach, we
+get a solution that everyone can utilize.
+
 How NBA _attmpts_ to solve this problem
 
 + Automatically report "OK" status on alerts that become "stale" 
