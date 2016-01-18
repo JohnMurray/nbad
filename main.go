@@ -13,6 +13,8 @@ const (
 
 	ERR_BINDING             = 1
 	ERR_ACCPT_INCOMING_CONN = 2
+
+	GATEWAY_MESSAGE_BUFFER_SIZE = 100
 )
 
 func main() {
@@ -29,7 +31,7 @@ func main() {
 	defer listener.Close()
 
 	// sping up message registry
-	startRegistry()
+	messageChannel := startGateway()
 
 	// listen for incoming connections
 	for {
@@ -38,12 +40,12 @@ func main() {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(ERR_ACCPT_INCOMING_CONN)
 		}
-		go handleRequest(conn)
+		go handleRequest(conn, messageChannel)
 	}
 }
 
 // handles incoming requests
-func handleRequest(conn net.Conn) {
+func handleRequest(conn net.Conn, messageChannel chan *Message) {
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
 	// Read the incoming connection into the buffer.
@@ -57,16 +59,26 @@ func handleRequest(conn net.Conn) {
 		buf = buf[:n]
 	}
 	message, err := ParseMessage(buf)
+
+	// continue down processing pipeline
 	if err != nil {
 		// todo: determine how to send proper error response
 		conn.Write([]byte("Message could not be processed."))
+	} else {
+		messageChannel <- message
+		// fmt.Printf("%v\n", message)
 	}
-
-	fmt.Printf("%v\n", message)
 
 	conn.Close()
 }
 
-func startRegistry() {
+func startGateway() chan *Message {
 	// todo: start a go-proc that runs the registry (needs better name)
+	_registry := &Registry{cache: make(map[string]*Message)}
+	gateway := &Gateway{registry: _registry}
+
+	ch := make(chan *Message, GATEWAY_MESSAGE_BUFFER_SIZE)
+	go gateway.run(ch)
+
+	return ch
 }

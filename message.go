@@ -39,8 +39,6 @@ type Message struct {
 }
 
 func ParseMessage(bytes []byte) (*Message, error) {
-	fmt.Println("length", len(bytes))
-	fmt.Printf("%v\n", bytes)
 	if len(bytes) >= 2 {
 		version := binary.BigEndian.Uint16(bytes[:2])
 		if version != 3 {
@@ -48,10 +46,10 @@ func ParseMessage(bytes []byte) (*Message, error) {
 		}
 	}
 
-	// ensure we're dealing with a proper v3 message via length
-	if len(bytes) != NAGIOS_MESSAGE_LEN {
-		return nil, fmt.Errorf("Expected message of %d bytes, received %d", NAGIOS_MESSAGE_LEN, len(bytes))
-	}
+	// // ensure we're dealing with a proper v3 message via length
+	// if len(bytes) != NAGIOS_MESSAGE_LEN {
+	// 	return nil, fmt.Errorf("Expected message of %d bytes, received %d", NAGIOS_MESSAGE_LEN, len(bytes))
+	// }
 
 	// discard CRC for now. not sure what to do with it just yet
 	// todo: figure out the right way to validate this
