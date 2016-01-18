@@ -1,5 +1,7 @@
 # Nagios Buffering Agent (NBA)
 
+_This project is an early-stage work-in-progress! Do not use for production use._
+
 A small application that emulates the Nagios NSCA agent locally and acts as
 a buffering agent to perform "smarter" actions on behalf of the application
 raising alerts.
