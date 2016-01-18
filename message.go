@@ -49,9 +49,9 @@ func ParseMessage(bytes []byte) (*Message, error) {
 	}
 
 	// ensure we're dealing with a proper v3 message via length
-	// if len(bytes) != NAGIOS_MESSAGE_LEN {
-	// 	return nil, fmt.Errorf("Expected message of %d bytes, received %d", NAGIOS_MESSAGE_LEN, len(bytes))
-	// }
+	if len(bytes) != NAGIOS_MESSAGE_LEN {
+		return nil, fmt.Errorf("Expected message of %d bytes, received %d", NAGIOS_MESSAGE_LEN, len(bytes))
+	}
 
 	// discard CRC for now. not sure what to do with it just yet
 	// todo: figure out the right way to validate this
