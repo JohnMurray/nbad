@@ -19,12 +19,13 @@ const (
 )
 
 func main() {
+	Logger().Info.Println("Starting up NBAd")
 
 	address := CONN_HOST + ":" + CONN_PORT
 
 	listener, err := net.Listen(CONN_TYPE, address)
 	if err != nil {
-		fmt.Println("Could bind to "+address+": ", err.Error())
+		Logger().Error.Println("could not bind to "+address, err.Error())
 		os.Exit(ERR_BINDING)
 	}
 
@@ -38,7 +39,7 @@ func main() {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
+			Logger().Error.Println("Error accepting connection", err.Error())
 			os.Exit(ERR_ACCPT_INCOMING_CONN)
 		}
 		go handleRequest(conn, messageChannel)
@@ -47,12 +48,15 @@ func main() {
 
 // handles incoming requests
 func handleRequest(conn net.Conn, messageChannel chan *Message) {
+	defer conn.Close()
+
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
 	// Read the incoming connection into the buffer.
 	n, err := conn.Read(buf)
 	if err != nil {
-		fmt.Println("Error reading:", err.Error())
+		Logger().Warning.Println("Error reading incoming request", err.Error())
+		return
 	}
 
 	// attempt to parse the message
@@ -63,14 +67,13 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 
 	// continue down processing pipeline
 	if err != nil {
+		Logger().Warning.Println("Failed to parse message", err.Error())
 		// todo: determine how to send proper error response
 		conn.Write([]byte("Message could not be processed."))
 	} else {
+		Logger().Trace.Printf("Processing message: %v\n", message)
 		messageChannel <- message
-		// fmt.Printf("%v\n", message)
 	}
-
-	conn.Close()
 }
 
 func startGateway() chan *Message {

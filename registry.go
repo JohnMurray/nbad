@@ -45,7 +45,7 @@ func (r *Registry) expireOldCache() {
 		now := time.Now()
 		for k, v := range r.cache {
 			if now.After(v.expireAt) {
-				fmt.Printf("Expiring cache %s\n", k)
+				Logger().Trace.Printf("Expiring cache %s\n", k)
 				delete(r.cache, k)
 				// todo: send notification
 			}

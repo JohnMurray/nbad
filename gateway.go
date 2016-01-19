@@ -21,9 +21,9 @@ type Gateway struct {
 func (g *Gateway) run(ch chan *Message) {
 	for {
 		message := <-ch
-		fmt.Printf("Received message: %v\n", message)
 		if g.registry.Contains(message) {
 			fmt.Println("duplicate message")
+			Logger().Trace.Printf("Duplicate message: %v\n", message)
 		}
 		g.registry.Update(message)
 	}
