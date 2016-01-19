@@ -1,4 +1,4 @@
-# Nagios Buffering Agent (NBA)
+# Nagios Buffering Agent daemon (NBAd)
 
 _This project is an early-stage work-in-progress! Do not use for production use._
 

@@ -9,6 +9,7 @@ _test
 
 # binaries
 nba
+nbad
 
 # Architecture specific extensions/prefixes
 *.[568vq]
