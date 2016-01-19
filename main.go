@@ -15,6 +15,7 @@ const (
 	ERR_ACCPT_INCOMING_CONN = 2
 
 	GATEWAY_MESSAGE_BUFFER_SIZE = 100
+	MESSAGE_CACHE_TTL_SECONDS   = 20
 )
 
 func main() {
@@ -74,8 +75,9 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 
 func startGateway() chan *Message {
 	// todo: start a go-proc that runs the registry (needs better name)
-	_registry := &Registry{cache: make(map[string]*Message)}
-	gateway := &Gateway{registry: _registry}
+	gateway := &Gateway{
+		registry: newRegistry(MESSAGE_CACHE_TTL_SECONDS),
+	}
 
 	ch := make(chan *Message, GATEWAY_MESSAGE_BUFFER_SIZE)
 	go gateway.run(ch)
