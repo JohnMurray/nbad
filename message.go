@@ -53,12 +53,12 @@ func ParseMessage(bytes []byte) (*Message, error) {
 	// }
 
 	// discard CRC for now. not sure what to do with it just yet
-	// todo: figure out the right way to validate this
+	// TODO: figure out the right way to validate this
 	binary.BigEndian.Uint32(bytes[4:8])
 
 	// read the timestamp
 	timestamp := binary.BigEndian.Uint32(bytes[8:12])
-	// todo: validate timestamp as semi-current
+	// TODO: validate timestamp as semi-current ?? (maybe?)
 
 	// read the return-code (state)
 	returnCode := binary.BigEndian.Uint16(bytes[12:14])

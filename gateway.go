@@ -30,7 +30,9 @@ func (g *Gateway) run(ch chan *Message) {
 	}
 }
 
+// newGateway creates a new gateway object
 func newGateway(r *Registry) *Gateway {
 	g := &Gateway{registry: r}
+	// TODO setup subscription channel for registry timeout notifications
 	return g
 }

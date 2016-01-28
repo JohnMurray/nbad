@@ -32,12 +32,12 @@ func newRegistry(ttlInSeconds uint32) *Registry {
 		cache:        make(map[string]*CacheEntry),
 		ttlInSeconds: ttlInSeconds,
 	}
-	// todo: start expiry go-routine here
+	// TODO: start expiry go-routine here
 	go registry.expireOldCache()
 	return registry
 }
 
-// todo: gateway needs to be notified of expiry events from the registry
+// TODO: gateway needs to be notified of expiry events from the registry
 func (r *Registry) expireOldCache() {
 	interval := 100 * time.Millisecond
 	for {
@@ -48,7 +48,7 @@ func (r *Registry) expireOldCache() {
 			if now.After(v.expireAt) {
 				Logger().Trace.Printf("Expiring cache %s\n", k)
 				delete(r.cache, k)
-				// todo: send notification
+				// TODO: send notification
 			}
 		}
 	}

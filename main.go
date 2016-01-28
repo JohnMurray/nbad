@@ -67,7 +67,7 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 	// continue down processing pipeline
 	if err != nil {
 		Logger().Warning.Println("Failed to parse message", err.Error())
-		// todo: determine how to send proper error response
+		// TODO: determine how to send proper error response
 		conn.Write([]byte("Message could not be processed."))
 	} else {
 		Logger().Trace.Printf("Processing message: %v\n", message)
@@ -76,7 +76,7 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 }
 
 func startGateway() chan *Message {
-	// todo: start a go-proc that runs the registry (needs better name)
+	// TODO: start a go-proc that runs the registry (needs better name)
 	gateway := &Gateway{
 		registry: newRegistry(messageCacheTTLSeconds),
 	}
