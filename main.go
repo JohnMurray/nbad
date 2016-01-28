@@ -14,7 +14,7 @@ const (
 	errAccptIncomingConn = 2
 
 	gatewayMessageBufferSize        = 100
-	messageCacheTTLSeconds          = 20
+	messageCacheTTLSeconds          = 5
 	messageExpirationChanBufferSize = 100
 )
 
@@ -40,6 +40,7 @@ func main() {
 		conn, err := listener.Accept()
 		if err != nil {
 			Logger().Error.Println("Error accepting connection", err.Error())
+			// FIXME should not exit on error. Need to handle error appropriately.
 			os.Exit(errAccptIncomingConn)
 		}
 		go handleRequest(conn, messageChannel)
@@ -76,14 +77,18 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 	}
 }
 
+// Starts a gateway process. Returns a channel to send new messages to the gateway.
 func startGateway() chan *Message {
 	// channel for listening to cache expiration
 	expiryChan := make(chan *Message, messageExpirationChanBufferSize)
+
+	// channel for sending new messages to the Gateway
+	newMessageChan := make(chan *Message, gatewayMessageBufferSize)
+
 	registry := newRegistry(messageCacheTTLSeconds, expiryChan)
-	gateway := newGateway(registry)
+	gateway := newGateway(registry, newMessageChan)
 
-	ch := make(chan *Message, gatewayMessageBufferSize)
-	go gateway.run(ch)
+	go gateway.run()
 
-	return ch
+	return newMessageChan
 }

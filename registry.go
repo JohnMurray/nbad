@@ -10,6 +10,7 @@ package main
  */
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -49,7 +50,6 @@ func (r *Registry) expireOldCache(expireChan chan *Message) {
 		now := time.Now()
 		for k, v := range r.cache {
 			if now.After(v.expireAt) {
-				Logger().Trace.Printf("Expiring cache %s\n", k)
 				delete(r.cache, k)
 				// send notification of message expiration
 				expireChan <- v.message
@@ -73,4 +73,20 @@ func (r *Registry) update(message *Message) {
 		expireAt: time.Now().Add(time.Duration(r.ttlInSeconds) * time.Second),
 	}
 	r.cache[message.Service] = ce
+}
+
+func (r *Registry) get(key string) *Message {
+	if ce, ok := r.cache[key]; ok {
+		return ce.message
+	}
+	return nil
+}
+
+func (r *Registry) summaryString() string {
+	s := ""
+	for k, v := range r.cache {
+		entry := fmt.Sprintf("\t%s: %s\n", k, stateName(v.message.State))
+		s = s + entry
+	}
+	return s
 }

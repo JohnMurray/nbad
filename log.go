@@ -16,7 +16,6 @@ package main
  */
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"sync"
@@ -42,7 +41,7 @@ func Logger() MyLoggers {
 }
 
 func initLoggers() {
-	traceHandle := ioutil.Discard
+	traceHandle := os.Stderr // ioutil.Discard
 	infoHandle := os.Stderr
 	warningHandle := os.Stderr
 	errorHandle := os.Stderr

@@ -67,6 +67,7 @@ func parseMessage(bytes []byte) (*Message, error) {
 		returnCode != stateCritical &&
 		returnCode != stateUnknown {
 
+		Logger().Trace.Printf("Unknown return code received %d", returnCode)
 		return nil, fmt.Errorf("Unknown return code received %d", returnCode)
 	}
 
@@ -88,4 +89,17 @@ func parseMessage(bytes []byte) (*Message, error) {
 		Service:   service,
 		Message:   description,
 	}, nil
+}
+
+func stateName(state uint16) string {
+	switch state {
+	case stateOk:
+		return "OK"
+	case stateWarning:
+		return "WARNING"
+	case stateCritical:
+		return "CRITICAL"
+	default:
+		return "UNKNOWN"
+	}
 }

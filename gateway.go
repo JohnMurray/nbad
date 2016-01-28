@@ -7,24 +7,21 @@ package main
  * are made on which alerts are proxied, cached, discarded, set OK, etc.
  */
 
-import (
-	"fmt"
-)
-
 // Gateway is where all the messages flow through
 type Gateway struct {
-	registry *Registry
+	registry            *Registry
+	incomingMessageChan chan *Message
 }
 
 /**
  * Initiates the gateway that listens and processes messages.
  */
-func (g *Gateway) run(incomingMessageChan chan *Message) {
+func (g *Gateway) run() {
 	// setup subscription channel for registry timeout notifications
 	go g.handleExpiry(g.registry.expireChan)
 
 	// handle all incoming (new messages) from clients
-	go g.handleIncomingMessages(incomingMessageChan)
+	go g.handleIncomingMessages(g.incomingMessageChan)
 }
 
 /**
@@ -34,11 +31,13 @@ func (g *Gateway) handleIncomingMessages(ch chan *Message) {
 	for {
 		message := <-ch
 		if g.registry.contains(message) {
-			fmt.Println("duplicate message")
-			Logger().Trace.Printf("Duplicate message: %v\n", message)
+			Logger().Trace.Printf("Duplicate message for service: %s\n", message.Service)
 		}
-		// TODO detect state-change, act appropriately
+		if oldMessage := g.registry.get(message.Service); oldMessage != nil {
+			// TODO detect state-change, act appropriately
+		}
 		g.registry.update(message)
+		Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
 	}
 }
 
@@ -50,21 +49,29 @@ func (g *Gateway) handleIncomingMessages(ch chan *Message) {
 func (g *Gateway) handleExpiry(expireNotificationChan chan *Message) {
 	for {
 		message := <-expireNotificationChan
+		Logger().Info.Printf("expired message: %v with state %s\n", message, stateName(message.State))
 		if message.State == stateOk {
 
 		}
 		switch message.State {
 		case stateOk:
-			break
+			// do nothing
 		case stateWarning:
+			fallthrough
 		case stateCritical:
-		case stateUnknown:
 			// TODO clear the state to the upstream nagios server
+			Logger().Trace.Println("Expired message in non-OK state")
+			Logger().Info.Printf("Setting service %s to OK", message.Service)
+		default:
+			Logger().Trace.Println("Expired message in UNKNOWN state")
 		}
 	}
 }
 
-func newGateway(r *Registry) *Gateway {
-	g := &Gateway{registry: r}
+func newGateway(r *Registry, incomingMessageChan chan *Message) *Gateway {
+	g := &Gateway{
+		registry:            r,
+		incomingMessageChan: incomingMessageChan,
+	}
 	return g
 }
