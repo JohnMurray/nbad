@@ -4,8 +4,9 @@ package main
  * File: registry.go
  *
  * The registry contains a local cache table of recent messages that have flowed
- * through the agent. This local cache aids in decision making of what should be
- * sent up to the master Nagios host.
+ * through the agent. What exists in the registry for any given event can be thought
+ * of the last known state of the message / event. This local cache aids in decision
+ * making of what should be sent up to the master Nagios host.
  */
 
 import (
@@ -19,6 +20,9 @@ type Registry struct {
 
 	// how long before a message should be expired from the cache
 	ttlInSeconds uint32
+
+	// channel that expiration notfications are sent through
+	expireChan chan *Message
 }
 
 // CacheEntry is something to store in the Registry
@@ -27,18 +31,17 @@ type CacheEntry struct {
 	expireAt time.Time
 }
 
-func newRegistry(ttlInSeconds uint32) *Registry {
+func newRegistry(ttlInSeconds uint32, expireChan chan *Message) *Registry {
 	registry := &Registry{
 		cache:        make(map[string]*CacheEntry),
 		ttlInSeconds: ttlInSeconds,
+		expireChan:   expireChan,
 	}
-	// TODO: start expiry go-routine here
-	go registry.expireOldCache()
+	go registry.expireOldCache(expireChan)
 	return registry
 }
 
-// TODO: gateway needs to be notified of expiry events from the registry
-func (r *Registry) expireOldCache() {
+func (r *Registry) expireOldCache(expireChan chan *Message) {
 	interval := 100 * time.Millisecond
 	for {
 		time.Sleep(interval)
@@ -48,14 +51,15 @@ func (r *Registry) expireOldCache() {
 			if now.After(v.expireAt) {
 				Logger().Trace.Printf("Expiring cache %s\n", k)
 				delete(r.cache, k)
-				// TODO: send notification
+				// send notification of message expiration
+				expireChan <- v.message
 			}
 		}
 	}
 }
 
 // Contains checks to see if the message is currently in the registry.
-func (r *Registry) Contains(message *Message) bool {
+func (r *Registry) contains(message *Message) bool {
 	if _, ok := r.cache[message.Service]; ok {
 		return true
 	}
@@ -63,7 +67,7 @@ func (r *Registry) Contains(message *Message) bool {
 }
 
 // Update stores message in the registry or updates it if it's already there
-func (r *Registry) Update(message *Message) {
+func (r *Registry) update(message *Message) {
 	ce := &CacheEntry{
 		message:  message,
 		expireAt: time.Now().Add(time.Duration(r.ttlInSeconds) * time.Second),

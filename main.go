@@ -13,8 +13,9 @@ const (
 	errBinding           = 1
 	errAccptIncomingConn = 2
 
-	gatewayMessageBufferSize = 100
-	messageCacheTTLSeconds   = 20
+	gatewayMessageBufferSize        = 100
+	messageCacheTTLSeconds          = 20
+	messageExpirationChanBufferSize = 100
 )
 
 func main() {
@@ -62,7 +63,7 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 	if n < 1024 {
 		buf = buf[:n]
 	}
-	message, err := ParseMessage(buf)
+	message, err := parseMessage(buf)
 
 	// continue down processing pipeline
 	if err != nil {
@@ -76,10 +77,10 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 }
 
 func startGateway() chan *Message {
-	// TODO: start a go-proc that runs the registry (needs better name)
-	gateway := &Gateway{
-		registry: newRegistry(messageCacheTTLSeconds),
-	}
+	// channel for listening to cache expiration
+	expiryChan := make(chan *Message, messageExpirationChanBufferSize)
+	registry := newRegistry(messageCacheTTLSeconds, expiryChan)
+	gateway := newGateway(registry)
 
 	ch := make(chan *Message, gatewayMessageBufferSize)
 	go gateway.run(ch)

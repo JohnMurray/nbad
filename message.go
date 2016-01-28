@@ -39,7 +39,7 @@ type Message struct {
 }
 
 // ParseMessage parses byte arrays to Nagios Message v3 spec (or as close as I can get)
-func ParseMessage(bytes []byte) (*Message, error) {
+func parseMessage(bytes []byte) (*Message, error) {
 	if len(bytes) >= 2 {
 		version := binary.BigEndian.Uint16(bytes[:2])
 		if version != 3 {
