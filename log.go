@@ -25,6 +25,7 @@ import (
 var _loggers MyLoggers
 var once sync.Once
 
+// MyLoggers is a simple log container for my application
 type MyLoggers struct {
 	Trace   *log.Logger
 	Info    *log.Logger
@@ -32,6 +33,7 @@ type MyLoggers struct {
 	Error   *log.Logger
 }
 
+// Logger returns a custom set of loggers
 func Logger() MyLoggers {
 	once.Do(func() {
 		initLoggers()

@@ -9,10 +9,10 @@ package main
  */
 
 import (
-	"fmt"
 	"time"
 )
 
+// Registry is just a fancy cache with a TTL
 type Registry struct {
 	// cache of messages
 	cache map[string]*CacheEntry
@@ -21,6 +21,7 @@ type Registry struct {
 	ttlInSeconds uint32
 }
 
+// CacheEntry is something to store in the Registry
 type CacheEntry struct {
 	message  *Message
 	expireAt time.Time
@@ -53,14 +54,15 @@ func (r *Registry) expireOldCache() {
 	}
 }
 
+// Contains checks to see if the message is currently in the registry.
 func (r *Registry) Contains(message *Message) bool {
 	if _, ok := r.cache[message.Service]; ok {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
+// Update stores message in the registry or updates it if it's already there
 func (r *Registry) Update(message *Message) {
 	ce := &CacheEntry{
 		message:  message,

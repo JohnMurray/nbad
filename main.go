@@ -1,32 +1,31 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"os"
 )
 
 const (
-	CONN_TYPE = "tcp"
-	CONN_HOST = "localhost"
-	CONN_PORT = "5667"
+	connType = "tcp"
+	connHost = "localhost"
+	connPort = "5667"
 
-	ERR_BINDING             = 1
-	ERR_ACCPT_INCOMING_CONN = 2
+	errBinding           = 1
+	errAccptIncomingConn = 2
 
-	GATEWAY_MESSAGE_BUFFER_SIZE = 100
-	MESSAGE_CACHE_TTL_SECONDS   = 20
+	gatewayMessageBufferSize = 100
+	messageCacheTTLSeconds   = 20
 )
 
 func main() {
 	Logger().Info.Println("Starting up NBAd")
 
-	address := CONN_HOST + ":" + CONN_PORT
+	address := connHost + ":" + connPort
 
-	listener, err := net.Listen(CONN_TYPE, address)
+	listener, err := net.Listen(connType, address)
 	if err != nil {
 		Logger().Error.Println("could not bind to "+address, err.Error())
-		os.Exit(ERR_BINDING)
+		os.Exit(errBinding)
 	}
 
 	// close listener on program exit
@@ -40,7 +39,7 @@ func main() {
 		conn, err := listener.Accept()
 		if err != nil {
 			Logger().Error.Println("Error accepting connection", err.Error())
-			os.Exit(ERR_ACCPT_INCOMING_CONN)
+			os.Exit(errAccptIncomingConn)
 		}
 		go handleRequest(conn, messageChannel)
 	}
@@ -79,10 +78,10 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 func startGateway() chan *Message {
 	// todo: start a go-proc that runs the registry (needs better name)
 	gateway := &Gateway{
-		registry: newRegistry(MESSAGE_CACHE_TTL_SECONDS),
+		registry: newRegistry(messageCacheTTLSeconds),
 	}
 
-	ch := make(chan *Message, GATEWAY_MESSAGE_BUFFER_SIZE)
+	ch := make(chan *Message, gatewayMessageBufferSize)
 	go gateway.run(ch)
 
 	return ch

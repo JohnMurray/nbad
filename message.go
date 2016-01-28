@@ -16,12 +16,12 @@ import (
 )
 
 const (
-	STATE_OK = iota
-	STATE_WARNING
-	STATE_CRITICAL
-	STATE_UNKNOWN
+	stateOk = iota
+	stateWarning
+	stateCritical
+	stateUnknown
 
-	NAGIOS_MESSAGE_LEN = 720
+	nagiosMessageLen = 720
 )
 
 // Message is the contents of an NSCA message
@@ -38,6 +38,7 @@ type Message struct {
 	Message string
 }
 
+// ParseMessage parses byte arrays to Nagios Message v3 spec (or as close as I can get)
 func ParseMessage(bytes []byte) (*Message, error) {
 	if len(bytes) >= 2 {
 		version := binary.BigEndian.Uint16(bytes[:2])
@@ -61,7 +62,11 @@ func ParseMessage(bytes []byte) (*Message, error) {
 
 	// read the return-code (state)
 	returnCode := binary.BigEndian.Uint16(bytes[12:14])
-	if returnCode != STATE_OK && returnCode != STATE_WARNING && returnCode != STATE_CRITICAL && returnCode != STATE_UNKNOWN {
+	if returnCode != stateOk &&
+		returnCode != stateWarning &&
+		returnCode != stateCritical &&
+		returnCode != stateUnknown {
+
 		return nil, fmt.Errorf("Unknown return code received %d", returnCode)
 	}
 

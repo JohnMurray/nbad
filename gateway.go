@@ -11,6 +11,7 @@ import (
 	"fmt"
 )
 
+// Gateway is where all the messages flow through
 type Gateway struct {
 	registry *Registry
 }
@@ -27,4 +28,9 @@ func (g *Gateway) run(ch chan *Message) {
 		}
 		g.registry.Update(message)
 	}
+}
+
+func newGateway(r *Registry) *Gateway {
+	g := &Gateway{registry: r}
+	return g
 }
