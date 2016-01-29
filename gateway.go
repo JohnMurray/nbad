@@ -34,7 +34,11 @@ func (g *Gateway) handleIncomingMessages(ch chan *Message) {
 			Logger().Trace.Printf("Duplicate message for service: %s\n", message.Service)
 		}
 		if oldMessage := g.registry.get(message.Service); oldMessage != nil {
-			// TODO detect state-change, act appropriately
+			if message.State > oldMessage.State {
+				// TODO things got worse, what now?
+			} else {
+				// TODO things got better, what now?
+			}
 		}
 		g.registry.update(message)
 		Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
