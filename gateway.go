@@ -30,9 +30,6 @@ func (g *Gateway) run() {
 func (g *Gateway) handleIncomingMessages(ch chan *Message) {
 	for {
 		message := <-ch
-		if g.registry.contains(message) {
-			Logger().Trace.Printf("HOLD Duplicate message for service: %s\n", message.Service)
-		}
 		if oldMessage := g.registry.get(message.Service); oldMessage != nil {
 			if message.State > oldMessage.State {
 				// TODO things got worse, what now?
@@ -47,7 +44,11 @@ func (g *Gateway) handleIncomingMessages(ch chan *Message) {
 			} else {
 				// it's the same... so we're not gonna do anything but buffer the
 				// message to the TTLs can be updated and what not
+				Logger().Trace.Printf("HOLD Duplicate message for service: %s\n", message.Service)
 			}
+		} else {
+			Logger().Trace.Printf("PUSH-NEW Sending state '%s' for '%s' upstream",
+				stateName(message.State), message.Service)
 		}
 		g.registry.update(message)
 		Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())

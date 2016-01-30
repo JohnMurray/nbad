@@ -14,7 +14,7 @@ const (
 	errAccptIncomingConn = 2
 
 	gatewayMessageBufferSize        = 100
-	messageCacheTTLSeconds          = 5
+	messageCacheTTLSeconds          = 60
 	messageExpirationChanBufferSize = 100
 )
 

@@ -36,7 +36,7 @@ while [[ $# > 0 ]] ; do
             ERROR_CODE="$2"
             shift # past argument
         ;;
-        -o|--host)
+        -h|--host)
             HOST="$2"
             shift # past argument
         ;;

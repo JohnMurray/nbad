@@ -85,7 +85,7 @@ func (r *Registry) get(key string) *Message {
 func (r *Registry) summaryString() string {
 	s := ""
 	for k, v := range r.cache {
-		entry := fmt.Sprintf("\t%s: %s\n", k, stateName(v.message.State))
+		entry := fmt.Sprintf("\t%s | %s | %s\n", k, stateName(v.message.State), v.message.Message)
 		s = s + entry
 	}
 	return s
