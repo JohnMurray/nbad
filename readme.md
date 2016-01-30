@@ -43,7 +43,23 @@ __Possible Future Additions__
 
 There is a small shell script in the repository `send_nsca.sh` that mimics the regular
 `send_nsca` command in a very small way. It uses `echo` and `nc` to send messages in the
-nsca v3 format to `localhost:5667` (default nbad port). You can use the script like so:
+nsca v3 format to `localhost:5667` (default nbad port). To see the script options you can
+simply run with the `--help` flag.
+
+```
+λ ./send_nsca.sh --help
+./send_nsca.sh [-e E -h H -s S -m M|--help]
+
+  --help              Print this error message
+  -e, --error-code    Error code value (0, 1, 2)
+  -h, --host          Host that the check is originating from
+  -s, --service       Service that the check is attached to
+  -m, --message       Check description message
+```
+
+
+Some examples of how to use the script (also it's a very simple script so you can always
+just crack open the source).
 
 ```
 # send OK

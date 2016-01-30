@@ -25,9 +25,10 @@ func main() {
 
 	listener, err := net.Listen(connType, address)
 	if err != nil {
-		Logger().Error.Println("could not bind to "+address, err.Error())
+		Logger().Error.Println("Could not bind to "+address, err.Error())
 		os.Exit(errBinding)
 	}
+	Logger().Info.Printf("Listening at %s\n", address)
 
 	// close listener on program exit
 	defer listener.Close()
@@ -40,8 +41,7 @@ func main() {
 		conn, err := listener.Accept()
 		if err != nil {
 			Logger().Error.Println("Error accepting connection", err.Error())
-			// FIXME should not exit on error. Need to handle error appropriately.
-			os.Exit(errAccptIncomingConn)
+			// FIXME should we do more than just print out an error here?
 		}
 		go handleRequest(conn, messageChannel)
 	}
