@@ -31,13 +31,22 @@ func (g *Gateway) handleIncomingMessages(ch chan *Message) {
 	for {
 		message := <-ch
 		if g.registry.contains(message) {
-			Logger().Trace.Printf("Duplicate message for service: %s\n", message.Service)
+			Logger().Trace.Printf("HOLD Duplicate message for service: %s\n", message.Service)
 		}
 		if oldMessage := g.registry.get(message.Service); oldMessage != nil {
 			if message.State > oldMessage.State {
 				// TODO things got worse, what now?
-			} else {
+				// send upstream
+				Logger().Info.Printf("PUSH Sending state '%s' for '%s' upstream",
+					stateName(message.State), message.Service)
+			} else if message.State < oldMessage.State {
 				// TODO things got better, what now?
+				// send upstream
+				Logger().Info.Printf("PUSH Sending state '%s' for '%s' upstream",
+					stateName(message.State), message.Service)
+			} else {
+				// it's the same... so we're not gonna do anything but buffer the
+				// message to the TTLs can be updated and what not
 			}
 		}
 		g.registry.update(message)
@@ -64,8 +73,8 @@ func (g *Gateway) handleExpiry(expireNotificationChan chan *Message) {
 			fallthrough
 		case stateCritical:
 			// TODO clear the state to the upstream nagios server
-			Logger().Trace.Println("Expired message in non-OK state")
-			Logger().Info.Printf("Setting service %s to OK", message.Service)
+			Logger().Info.Printf("PUSH Sending state '%s' for expired service '%s' upstream",
+				stateName(stateOk), message.Service)
 		default:
 			Logger().Trace.Println("Expired message in UNKNOWN state")
 		}

@@ -28,13 +28,18 @@ How NBA _attmpts_ to solve this problem
 
 + Automatically report "OK" status on alerts that become "stale"
   that previously reported an error. (likely resolved)
-- Buffer duplicate alerts to reduce noise / spam to monitoring server
-- Use a config to define default and per-service behaviors.
++ Buffer duplicate alerts to reduce noise / spam to monitoring server
+
+
+__Possible Future Additions__
+
++ Define a threshold that must be met before an error condition is propagated up-stream
++ Use a config to define default and per-service behaviors.
 
 
 
 
-## Testing
+## Testing / Debugging
 
 There is a small shell script in the repository `send_nsca.sh` that mimics the regular
 `send_nsca` command in a very small way. It uses `echo` and `nc` to send messages in the
@@ -51,6 +56,13 @@ nsca v3 format to `localhost:5667` (default nbad port). You can use the script l
 ./send_nsca.sh  -e 2 -h my-service-host -s my-service -m "oh god! everything is on fire!!!!"
 ```
 
-The script will take care of doing some basic validations on the input data in terms of lenght
+The script will take care of doing some basic validations on the input data in terms of length
 and what not as well as properly padding and forming the message. I'm not certain how this would
 work with non-ascii data, so... on you're own there.
+
+
+
+## TODO
+
++ Enable debug and trace logging from the command line
+  + Review logging to ensure completeness and proper log levels
