@@ -82,3 +82,6 @@ work with non-ascii data, so... on you're own there.
 
 + Enable debug and trace logging from the command line
   + Review logging to ensure completeness and proper log levels
++ Mimic nsca server better / more
+  + Implement CRC
+  + return initialization packet with IV and Timestamp in initial server connect

@@ -51,6 +51,8 @@ func main() {
 func handleRequest(conn net.Conn, messageChannel chan *Message) {
 	defer conn.Close()
 
+	// TODO send an initialization message (see https://github.com/Syncbak-Git/nsca/blob/master/packet.go#L163)
+
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
 	// Read the incoming connection into the buffer.
