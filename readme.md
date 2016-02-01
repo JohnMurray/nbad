@@ -85,3 +85,4 @@ work with non-ascii data, so... on you're own there.
 + Mimic nsca server better / more
   + Implement CRC
   + return initialization packet with IV and Timestamp in initial server connect
++ Flush messages on some cache interval (to avoid transient error conditions)
