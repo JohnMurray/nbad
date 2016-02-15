@@ -22,6 +22,8 @@ const (
 	stateUnknown
 
 	nagiosMessageLen = 720
+
+	NOT_REALLY_RECOMMENDED = 1
 )
 
 // Message is the contents of an NSCA message
@@ -40,6 +42,7 @@ type Message struct {
 
 // ParseMessage parses byte arrays to Nagios Message v3 spec (or as close as I can get)
 func parseMessage(bytes []byte) (*Message, error) {
+	fmt.Println(NOT_REALLY_RECOMMENDED)
 	if len(bytes) >= 2 {
 		version := binary.BigEndian.Uint16(bytes[:2])
 		if version != 3 {
