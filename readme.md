@@ -1,5 +1,7 @@
 # Nagios Buffering Agent daemon (NBAd)
 
+[![Build Status](https://travis-ci.org/JohnMurray/nbad.svg?branch=master)](https://travis-ci.org/JohnMurray/nbad)
+
 _This project is an early-stage work-in-progress! Do not use for production use._
 
 A small application that emulates the Nagios NSCA agent locally and acts as
