@@ -6,7 +6,11 @@ default: compile
 compile: setup
 	go build $(BUILD_OPTS) -o $(BIN_NAME)
 
-setup:
+
+# meta-task for performing all setup tasks
+setup: get-deps
+
+get-deps:
 	go get -u github.com/Syncbak-Git/nsca
 
 clean-compile: BUILD_OPTS += -a

@@ -1,0 +1,10 @@
+language: go
+
+go:
+  - 1.5
+  - tip
+
+install: make get-deps
+
+# TravisCI test command
+script: make clean-compile
