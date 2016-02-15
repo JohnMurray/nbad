@@ -11,6 +11,7 @@ raising alerts.
 + Passive checks that don’t clear themselves. This causes a lot of
   burden on pager to manually resolve these issue. Also, this results
   in alerts that cause additional noise.
++ Transient alerts (alert and quickly clear)
 + Flooding of passive checks when things go wrong can cause additional
   stress on nagios server to process input.
 

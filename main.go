@@ -18,6 +18,9 @@ const (
 	messageExpirationChanBufferSize = 100
 )
 
+// TODO add support for configuring all these stupid const things
+// TODO add command-line option support for stuffs (not sure what yet)
+
 func main() {
 	Logger().Info.Println("Starting up NBAd")
 
