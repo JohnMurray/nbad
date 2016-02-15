@@ -1,6 +1,7 @@
 # Nagios Buffering Agent daemon (NBAd)
 
 [![Build Status](https://travis-ci.org/JohnMurray/nbad.svg?branch=master)](https://travis-ci.org/JohnMurray/nbad)
+[![Go Report](https://goreportcard.com/badge/github.com/johnmurray/nbad)](https://goreportcard.com/report/github.com/johnmurray/nbad)
 
 _This project is an early-stage work-in-progress! Do not use for production use._
 
