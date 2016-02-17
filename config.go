@@ -12,13 +12,13 @@ const defaultConfLocation string = "conf.json"
 // NbadConfig is just the struct that holds all of the config values
 type NbadConfig struct {
 	// GatewayMessageBufferSize - The number of messages to buffer in memory for the gateway
-	GatewayMessageBufferSize int `json:"gateway_message_buffer_size"`
+	GatewayMessageBufferSize uint32 `json:"gateway_message_buffer_size"`
 
 	// MessageCacheTTLInSeconds - The time before a message expires (possibly causing reset of upstream state)
-	MessageCacheTTLInSeconds int `json:"message_cache_ttl_in_seconds"`
+	MessageCacheTTLInSeconds uint32 `json:"message_cache_ttl_in_seconds"`
 
 	// MessageInitBufferTimeSeconds - The amount of time a message is buffered before actioned upon
-	MessageInitBufferTimeSeconds int `json:"message_init_buffer_ttl_in_seconds"`
+	MessageInitBufferTimeSeconds uint32 `json:"message_init_buffer_ttl_in_seconds"`
 }
 
 var configLoadOnce sync.Once
@@ -36,6 +36,8 @@ func Config() *NbadConfig {
 }
 
 func loadConfigFile() {
+	Logger().Info.Printf("Loading config from file '%s'\n", defaultConfLocation)
+
 	// TODO make this file configurable via command line
 	file, err := os.Open(defaultConfLocation)
 	if err != nil {
