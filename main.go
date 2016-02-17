@@ -13,9 +13,9 @@ const (
 	errBinding           = 1
 	errAccptIncomingConn = 2
 
-	gatewayMessageBufferSize        = 100
-	messageCacheTTLSeconds          = 60
-	messageExpirationChanBufferSize = 100
+	gatewayMessageBufferSize    = 100
+	messageCacheTTLSeconds      = 60
+	messageInitBufferTTLSeconds = 10
 )
 
 // TODO add support for configuring all these stupid const things
@@ -51,7 +51,7 @@ func main() {
 }
 
 // handles incoming requests
-func handleRequest(conn net.Conn, messageChannel chan *Message) {
+func handleRequest(conn net.Conn, messageChannel chan *GatewayEvent) {
 	defer conn.Close()
 
 	// TODO send an initialization message (see https://github.com/Syncbak-Git/nsca/blob/master/packet.go#L163)
@@ -78,22 +78,23 @@ func handleRequest(conn net.Conn, messageChannel chan *Message) {
 		conn.Write([]byte("Message could not be processed."))
 	} else {
 		Logger().Trace.Printf("Processing message: %v\n", message)
-		messageChannel <- message
+		messageChannel <- newMessageEvent(message)
 	}
 }
 
 // Starts a gateway process. Returns a channel to send new messages to the gateway.
-func startGateway() chan *Message {
-	// channel for listening to cache expiration
-	expiryChan := make(chan *Message, messageExpirationChanBufferSize)
-
+func startGateway() chan *GatewayEvent {
 	// channel for sending new messages to the Gateway
-	newMessageChan := make(chan *Message, gatewayMessageBufferSize)
+	gatewayChan := make(chan *GatewayEvent, gatewayMessageBufferSize)
 
-	registry := newRegistry(messageCacheTTLSeconds, expiryChan)
-	gateway := newGateway(registry, newMessageChan)
+	registry := newRegistry(messageInitBufferTTLSeconds, messageCacheTTLSeconds, gatewayChan)
+	gateway := newGateway(registry, gatewayChan)
 
 	go gateway.run()
 
-	return newMessageChan
+	return gatewayChan
+}
+
+func newMessageEvent(m *Message) *GatewayEvent {
+	return &GatewayEvent{message: m}
 }

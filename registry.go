@@ -17,42 +17,53 @@ import (
 // Registry is just a fancy cache with a TTL
 type Registry struct {
 	// cache of messages
-	cache map[string]*CacheEntry
+	cache map[string]*MessageEntry
 
 	// how long before a message should be expired from the cache
 	ttlInSeconds uint32
 
+	// how long a message is initially buffered before it can be decisioned on
+	initBufferTTLInSeconds uint32
+
 	// channel that expiration notfications are sent through
-	expireChan chan *Message
+	expireChan chan *GatewayEvent
 }
 
-// CacheEntry is something to store in the Registry
-type CacheEntry struct {
-	message  *Message
-	expireAt time.Time
+// MessageEntry is something to store in the Registry
+type MessageEntry struct {
+	message            *Message
+	prevMessage        *Message
+	initBufferExpireAt time.Time
+	expireAt           time.Time
 }
 
-func newRegistry(ttlInSeconds uint32, expireChan chan *Message) *Registry {
+// StateExpiry is an event raised when the current service state expires (no recent message)
+type StateExpiry struct{ service string }
+
+// InitBufferExpiry is an event raised when buffering of initial server state has been reached
+type InitBufferExpiry struct{ service string }
+
+func newRegistry(initBufferTTLInSeconds uint32, ttlInSeconds uint32, expireChan chan *GatewayEvent) *Registry {
 	registry := &Registry{
-		cache:        make(map[string]*CacheEntry),
-		ttlInSeconds: ttlInSeconds,
-		expireChan:   expireChan,
+		cache:                  make(map[string]*MessageEntry),
+		ttlInSeconds:           ttlInSeconds,
+		initBufferTTLInSeconds: initBufferTTLInSeconds,
+		expireChan:             expireChan,
 	}
 	go registry.expireOldCache(expireChan)
 	return registry
 }
 
-func (r *Registry) expireOldCache(expireChan chan *Message) {
+func (r *Registry) expireOldCache(expireChan chan *GatewayEvent) {
 	interval := 100 * time.Millisecond
 	for {
 		time.Sleep(interval)
 
 		now := time.Now()
-		for k, v := range r.cache {
+		for _, v := range r.cache {
 			if now.After(v.expireAt) {
-				delete(r.cache, k)
 				// send notification of message expiration
-				expireChan <- v.message
+				expireChan <- &GatewayEvent{stateExpiry: &StateExpiry{service: v.message.Service}}
 			}
 		}
 	}
@@ -68,16 +79,27 @@ func (r *Registry) contains(message *Message) bool {
 
 // Update stores message in the registry or updates it if it's already there
 func (r *Registry) update(message *Message) {
-	ce := &CacheEntry{
+	// TODO store into registry with init-buffer TTL
+	me := &MessageEntry{
 		message:  message,
 		expireAt: time.Now().Add(time.Duration(r.ttlInSeconds) * time.Second),
 	}
-	r.cache[message.Service] = ce
+	if prev := r.get(message.Service); prev != nil {
+		me.prevMessage = prev
+	}
+	r.cache[message.Service] = me
 }
 
 func (r *Registry) get(key string) *Message {
 	if ce, ok := r.cache[key]; ok {
 		return ce.message
+	}
+	return nil
+}
+
+func (r *Registry) getPrev(key string) *Message {
+	if ce, ok := r.cache[key]; ok {
+		return ce.prevMessage
 	}
 	return nil
 }
