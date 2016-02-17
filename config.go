@@ -1,5 +1,13 @@
 package main
 
+/**
+ * File: config.go
+ *
+ * Defines a simply way to access config values from anywhere in the program by simply
+ * calling `Config()`. Takes care of lazily loading configuration if it has not already
+ * been loaded.
+ */
+
 import (
 	"encoding/json"
 	"os"
