@@ -22,6 +22,7 @@ const (
 // TODO add command-line option support for stuffs (not sure what yet)
 
 func main() {
+	Config()
 	Logger().Info.Println("Starting up NBAd")
 
 	address := connHost + ":" + connPort
