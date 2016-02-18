@@ -11,6 +11,7 @@ compile: setup
 
 # meta-task for performing all setup tasks
 setup: get-deps
+	@cp etc/pre-push-git-hook .git/hooks/pre-push
 
 get-deps:
 	go get -u github.com/Syncbak-Git/nsca

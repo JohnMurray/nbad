@@ -36,6 +36,7 @@ var nbadConfig *NbadConfig
 func Config() *NbadConfig {
 	configLoadOnce.Do(func() {
 		loadConfigFile()
+		validateConfig()
 	})
 
 	Logger().Trace.Printf("Loaded config: %v\n", nbadConfig)
@@ -60,4 +61,12 @@ func loadConfigFile() {
 	}
 
 	nbadConfig = configuration
+}
+
+func validateConfig() {
+	c := nbadConfig
+
+	if c.MessageInitBufferTimeSeconds > c.MessageCacheTTLInSeconds {
+		Logger().Error.Fatalln("init buffer ttl cannot be greater than message cache ttl")
+	}
 }

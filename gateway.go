@@ -51,10 +51,14 @@ func (g *Gateway) handleIncomingEvents(ch chan *GatewayEvent) {
 		if event.message != nil {
 			/*
 			 * The event is an incoming message. All incoming messages should be buffered for a small
-			 * period of time to make sure we're not thrashing (flip-flopping).
+			 * period of time to make sure we're not thrashing (flip-flopping). However we have to be careful
+			 * so that a flooding scenario doesn't cause us to stall indefinitely. Thus the following rules
+			 * can be applied:
+			 *   - if no previous service alert, store
+			 *   - if previous service alert with same state (OK, WARN, etc), discard current message, update no TTLs
+			 *   - if previous service alert is different, update message and all TTLs
 			 */
-			// TODO a flood of duplicate states will continually push back buffer-init-ttl, meaning no messages sent.
-			//      figure a good way to handle duplicates / flooding
+			// TODO - Update logic to reflect above description
 			g.registry.update(event.message)
 			Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
 		} else if event.initBufferExpiry != nil {
