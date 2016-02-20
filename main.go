@@ -12,10 +12,6 @@ const (
 
 	errBinding           = 1
 	errAccptIncomingConn = 2
-
-	gatewayMessageBufferSize    = 100
-	messageCacheTTLSeconds      = 60
-	messageInitBufferTTLSeconds = 10
 )
 
 // TODO add support for configuring all these stupid const things
@@ -23,6 +19,9 @@ const (
 
 func main() {
 	Logger().Info.Println("Starting up NBAd")
+
+	// calling will force non-lazy load of config
+	Config()
 
 	address := connHost + ":" + connPort
 
@@ -85,9 +84,9 @@ func handleRequest(conn net.Conn, messageChannel chan *GatewayEvent) {
 // Starts a gateway process. Returns a channel to send new messages to the gateway.
 func startGateway() chan *GatewayEvent {
 	// channel for sending new messages to the Gateway
-	gatewayChan := make(chan *GatewayEvent, gatewayMessageBufferSize)
+	gatewayChan := make(chan *GatewayEvent, Config().GatewayMessageBufferSize)
 
-	registry := newRegistry(messageInitBufferTTLSeconds, messageCacheTTLSeconds, gatewayChan)
+	registry := newRegistry(Config().MessageInitBufferTimeSeconds, Config().MessageCacheTTLInSeconds, gatewayChan)
 	gateway := newGateway(registry, gatewayChan)
 
 	go gateway.run()

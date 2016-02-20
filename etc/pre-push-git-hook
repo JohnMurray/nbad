@@ -1,0 +1,8 @@
+#!/bin/sh
+
+make
+
+if [[ $? -ne 0 ]] ; then
+  echo "You're code don't make? No push for you!!"
+  exit 1
+fi
