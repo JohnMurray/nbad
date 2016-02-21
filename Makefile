@@ -1,4 +1,4 @@
-BUILD_OPTS=-p 4
+BUILD_OPTS=-p 4 -race
 BIN_NAME=nbad
 
 default: compile

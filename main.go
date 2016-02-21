@@ -45,12 +45,12 @@ func main() {
 			Logger().Error.Println("Error accepting connection", err.Error())
 			// FIXME should we do more than just print out an error here?
 		}
-		go handleRequest(conn, messageChannel)
+		go handleIncomingConn(conn, messageChannel)
 	}
 }
 
 // handles incoming requests
-func handleRequest(conn net.Conn, messageChannel chan *GatewayEvent) {
+func handleIncomingConn(conn net.Conn, messageChannel chan *GatewayEvent) {
 	defer conn.Close()
 
 	// TODO send an initialization message (see https://github.com/Syncbak-Git/nsca/blob/master/packet.go#L163)
@@ -86,7 +86,11 @@ func startGateway() chan *GatewayEvent {
 	// channel for sending new messages to the Gateway
 	gatewayChan := make(chan *GatewayEvent, Config().GatewayMessageBufferSize)
 
-	registry := newRegistry(Config().MessageInitBufferTimeSeconds, Config().MessageCacheTTLInSeconds, gatewayChan)
+	registry := &Registry{
+		cache:                  make(map[string]*MessageEntry),
+		ttlInSeconds:           Config().MessageCacheTTLInSeconds,
+		initBufferTTLInSeconds: Config().MessageInitBufferTimeSeconds,
+	}
 	gateway := newGateway(registry, gatewayChan)
 
 	go gateway.run()
