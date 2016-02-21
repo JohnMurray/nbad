@@ -24,9 +24,6 @@ type Registry struct {
 
 	// how long a message is initially buffered before it can be decisioned on
 	initBufferTTLInSeconds uint32
-
-	// channel that expiration notfications are sent through
-	expireChan chan *GatewayEvent
 }
 
 // MessageEntry is something to store in the Registry
@@ -35,38 +32,6 @@ type MessageEntry struct {
 	prevMessage        *Message
 	initBufferExpireAt time.Time
 	expireAt           time.Time
-}
-
-// StateExpiry is an event raised when the current service state expires (no recent message)
-type StateExpiry struct{ service string }
-
-// InitBufferExpiry is an event raised when buffering of initial server state has been reached
-type InitBufferExpiry struct{ service string }
-
-func newRegistry(initBufferTTLInSeconds uint32, ttlInSeconds uint32, expireChan chan *GatewayEvent) *Registry {
-	registry := &Registry{
-		cache:                  make(map[string]*MessageEntry),
-		ttlInSeconds:           ttlInSeconds,
-		initBufferTTLInSeconds: initBufferTTLInSeconds,
-		expireChan:             expireChan,
-	}
-	go registry.expireOldCache(expireChan)
-	return registry
-}
-
-func (r *Registry) expireOldCache(expireChan chan *GatewayEvent) {
-	interval := 100 * time.Millisecond
-	for {
-		time.Sleep(interval)
-
-		now := time.Now()
-		for _, v := range r.cache {
-			if now.After(v.expireAt) {
-				// send notification of message expiration
-				expireChan <- &GatewayEvent{stateExpiry: &StateExpiry{service: v.message.Service}}
-			}
-		}
-	}
 }
 
 // Contains checks to see if the message is currently in the registry.
