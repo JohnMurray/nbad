@@ -10,12 +10,10 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"sync"
 )
-
-// TODO this should really be like /etc/nbad/conf.json or something real
-const defaultConfLocation string = "conf.json"
 
 // NbadConfig is just the struct that holds all of the config values
 type NbadConfig struct {
@@ -27,46 +25,52 @@ type NbadConfig struct {
 
 	// MessageInitBufferTimeSeconds - The amount of time a message is buffered before actioned upon
 	MessageInitBufferTimeSeconds uint32 `json:"message_init_buffer_ttl_in_seconds"`
+
+	// TraceLogging - Enable trace logging (for debugging purposes)
+	TraceLogging bool
 }
 
 var configLoadOnce sync.Once
 var nbadConfig *NbadConfig
 
-// Config returns the current config file, loading it if necessary
+// Config returns the current config file
 func Config() *NbadConfig {
-	configLoadOnce.Do(func() {
-		loadConfigFile()
-		validateConfig()
-	})
-
-	Logger().Trace.Printf("Loaded config: %v\n", nbadConfig)
-
 	return nbadConfig
 }
 
-func loadConfigFile() {
-	Logger().Info.Printf("Loading config from file '%s'\n", defaultConfLocation)
+// InitConfig - loads the config file
+func InitConfig(configFile string, logger *log.Logger) {
+	configLoadOnce.Do(func() {
+		loadConfigFile(configFile, logger)
+		validateConfig(logger)
+	})
+
+	logger.Printf("Loaded config: %v\n", nbadConfig)
+}
+
+func loadConfigFile(confFile string, logger *log.Logger) {
+	logger.Printf("Loading config from file '%s'\n", confFile)
 
 	// TODO make this file configurable via command line
-	file, err := os.Open(defaultConfLocation)
+	file, err := os.Open(confFile)
 	if err != nil {
-		Logger().Error.Fatalf("could not load config file '%s': %v\n", defaultConfLocation, err)
+		logger.Fatalf("could not load config file '%s': %v\n", confFile, err)
 	}
 
 	decoder := json.NewDecoder(file)
 	configuration := &NbadConfig{}
 	err = decoder.Decode(configuration)
 	if err != nil {
-		Logger().Error.Fatalf("could not read config file '%s': %v", defaultConfLocation, err)
+		logger.Fatalf("could not read config file '%s': %v", confFile, err)
 	}
 
 	nbadConfig = configuration
 }
 
-func validateConfig() {
+func validateConfig(logger *log.Logger) {
 	c := nbadConfig
 
 	if c.MessageInitBufferTimeSeconds > c.MessageCacheTTLInSeconds {
-		Logger().Error.Fatalln("init buffer ttl cannot be greater than message cache ttl")
+		logger.Fatalln("init buffer ttl cannot be greater than message cache ttl")
 	}
 }

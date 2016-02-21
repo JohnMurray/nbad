@@ -3,6 +3,8 @@ package main
 import (
 	"net"
 	"os"
+
+	"github.com/codegangsta/cli"
 )
 
 const (
@@ -10,18 +12,47 @@ const (
 	connHost = "localhost"
 	connPort = "5667"
 
+	defaultConfLocation = "/etc/nbad/conf.json"
+
 	errBinding           = 1
 	errAccptIncomingConn = 2
 )
 
-// TODO add support for configuring all these stupid const things
-// TODO add command-line option support for stuffs (not sure what yet)
-
 func main() {
-	Logger().Info.Println("Starting up NBAd")
+	app := cli.NewApp()
+	app.Name = "nbad"
+	app.Usage = "NSCA Buffering Agent (daemon) - Emulates NSCA interface as local buffer/proxy"
 
-	// calling will force non-lazy load of config
-	Config()
+	var configFile string
+	var trace bool
+
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:        "config, c",
+			Value:       defaultConfLocation,
+			Usage:       "Location of config file on disk",
+			Destination: &configFile,
+		},
+		cli.BoolFlag{
+			Name:        "trace, t",
+			EnvVar:      "NBAD_TRACE",
+			Usage:       "Turn on trace-logging",
+			Destination: &trace,
+		},
+	}
+	app.Version = "1.0"
+	app.Action = func(c *cli.Context) {
+		// load configuration
+		InitConfig(configFile, TempLogger("STARTUP"))
+		Config().TraceLogging = trace
+
+		startServer()
+	}
+	app.Run(os.Args)
+}
+
+func startServer() {
+	Logger().Info.Println("Starting up NBAd")
 
 	address := connHost + ":" + connPort
 

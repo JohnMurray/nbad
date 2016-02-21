@@ -16,6 +16,8 @@ package main
  */
 
 import (
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"sync"
@@ -41,15 +43,30 @@ func Logger() MyLoggers {
 }
 
 func initLoggers() {
-	traceHandle := os.Stderr // ioutil.Discard
 	infoHandle := os.Stderr
 	warningHandle := os.Stderr
 	errorHandle := os.Stderr
 
-	_loggers = MyLoggers{
-		Trace:   log.New(traceHandle, "TRACE: ", log.Ldate|log.Ltime|log.Lshortfile),
-		Info:    log.New(infoHandle, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile),
-		Warning: log.New(warningHandle, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile),
-		Error:   log.New(errorHandle, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile),
+	var traceHandle io.Writer
+	var logFormat int
+
+	if Config().TraceLogging {
+		traceHandle = os.Stderr
+		logFormat = log.Ldate | log.Ltime | log.Lshortfile
+	} else {
+		traceHandle = ioutil.Discard
+		logFormat = log.Ldate | log.Ltime
 	}
+
+	_loggers = MyLoggers{
+		Trace:   log.New(traceHandle, "TRACE: ", logFormat),
+		Info:    log.New(infoHandle, "INFO: ", logFormat),
+		Warning: log.New(warningHandle, "WARNING: ", logFormat),
+		Error:   log.New(errorHandle, "ERROR: ", logFormat),
+	}
+}
+
+// TempLogger - returns a temporrary logger
+func TempLogger(level string) *log.Logger {
+	return log.New(os.Stderr, level+": ", log.Ldate|log.Ltime)
 }
