@@ -42,18 +42,18 @@ type InitBufferExpiry struct{ service string }
  */
 func (g *Gateway) run() {
 	g.startOnce.Do(func() {
-		go g.handleIncomingEvents(g.incomingEventChan)
+		go g.handleIncomingEvents()
 	})
 }
 
 // handleIncomingEvents - listen for incoming events and dispatch them to the appropriate handling code
-func (g *Gateway) handleIncomingEvents(ch chan *GatewayEvent) {
+func (g *Gateway) handleIncomingEvents() {
 	tick := time.Tick(100 * time.Millisecond)
 	for {
 		select {
 		case <-tick:
-			g.expireOldMessages(g.incomingEventChan)
-		case event := <-ch:
+			g.expireOldMessages()
+		case event := <-g.incomingEventChan:
 			if event == nil {
 				continue
 			}
@@ -63,15 +63,15 @@ func (g *Gateway) handleIncomingEvents(ch chan *GatewayEvent) {
 }
 
 // expireOldMessages - scan registry and emit events for message expirations
-func (g *Gateway) expireOldMessages(ch chan *GatewayEvent) {
+func (g *Gateway) expireOldMessages() {
 	now := time.Now()
 	for _, v := range g.registry.cache {
 		if now.After(v.expireAt) {
 			// send notification of message expiration
-			ch <- &GatewayEvent{stateExpiry: &StateExpiry{service: v.message.Service}}
+			g.incomingEventChan <- &GatewayEvent{stateExpiry: &StateExpiry{service: v.message.Service}}
 		} else if now.After(v.initBufferExpireAt) {
 			// send notification of init-buffer expiry
-			ch <- &GatewayEvent{initBufferExpiry: &InitBufferExpiry{service: v.message.Service}}
+			g.incomingEventChan <- &GatewayEvent{initBufferExpiry: &InitBufferExpiry{service: v.message.Service}}
 		}
 	}
 }
@@ -84,9 +84,10 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		 * so that a flooding scenario doesn't cause us to stall indefinitely. Thus the following rules
 		 * can be applied:
 		 *   - if no previous service alert, store
-		 *   - if previous service alert with same state (OK, WARN, etc), discard current message, update no TTLs
+		 *   - if previous service alert with same state (OK, WARN, etc), discard current message, don't update TTLs
 		 *   - if previous service alert is different, update message and all TTLs
 		 */
+		// TODO ^^ these rules don't actually solve the problem... so... that's lame.  -___-
 		// TODO - Update logic to reflect above description
 		g.registry.update(event.message)
 		Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
@@ -116,7 +117,7 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		 * and we can take action on it. If an event expires in an error-state, we can set it back to a
 		 * non-error state.
 		 *
-		 * TODO determine what the non-error state should be (OK?, WARN?, configurable?)
+		 * A non-error state is defined as OK here.
 		 */
 		if message := g.registry.get(event.stateExpiry.service); message != nil {
 			Logger().Info.Printf("expired message: %v with state %s\n", message, stateName(message.State))
@@ -125,7 +126,6 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 			case stateWarning:
 				fallthrough
 			case stateCritical:
-				// TODO clear the state to the upstream nagios server
 				Logger().Info.Printf("PUSH Sending state '%s' for expired service '%s' upstream",
 					stateName(stateOk), message.Service)
 			default:
