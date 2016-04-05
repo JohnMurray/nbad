@@ -139,7 +139,7 @@ work with non-ascii data, so... on you're own there.
 
 ## TODO
 
-+ [ ] Enable debug and trace logging from the command line
++ [x] Enable debug and trace logging from the command line
   + [ ] Review logging to ensure completeness and proper log levels
 + [ ] Mimic nsca server better / more
   + [ ] Implement CRC
