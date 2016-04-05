@@ -43,14 +43,14 @@ encoding/json	config.go	12;"	i	language:Go	line:12
 errAccptIncomingConn	main.go	18;"	c	access:private	language:Go	line:18
 errBinding	main.go	17;"	c	access:private	language:Go	line:17
 expireAt	registry.go	34;"	w	access:private	ctype:MessageEntry	language:Go	line:34	type:time.Time
-expireOldMessages	gateway.go	66;"	m	access:private	ctype:Gateway	language:Go	line:66	signature:(ch chan *GatewayEvent)
+expireOldMessages	gateway.go	66;"	m	access:private	ctype:Gateway	language:Go	line:66	signature:()
 fmt	message.go	15;"	i	language:Go	line:15
 fmt	registry.go	13;"	i	language:Go	line:13
 get	registry.go	58;"	m	access:private	ctype:Registry	language:Go	line:58	signature:(key string)	type:*Message
 getPrev	registry.go	65;"	m	access:private	ctype:Registry	language:Go	line:65	signature:(key string)	type:*Message
 github.com/codegangsta/cli	main.go	7;"	i	language:Go	line:7
 handleIncomingConn	main.go	84;"	f	access:private	language:Go	line:84	signature:(conn net.Conn, messageChannel chan *GatewayEvent)
-handleIncomingEvents	gateway.go	50;"	m	access:private	ctype:Gateway	language:Go	line:50	signature:(ch chan *GatewayEvent)
+handleIncomingEvents	gateway.go	50;"	m	access:private	ctype:Gateway	language:Go	line:50	signature:()
 handleMessageStateChange	gateway.go	79;"	m	access:private	ctype:Gateway	language:Go	line:79	signature:(event *GatewayEvent)
 incomingEventChan	gateway.go	23;"	w	access:private	ctype:Gateway	language:Go	line:23	type:chan *GatewayEvent
 initBufferExpireAt	registry.go	33;"	w	access:private	ctype:MessageEntry	language:Go	line:33	type:time.Time
@@ -103,4 +103,4 @@ time	gateway.go	17;"	i	language:Go	line:17
 time	registry.go	14;"	i	language:Go	line:14
 ttlInSeconds	registry.go	23;"	w	access:private	ctype:Registry	language:Go	line:23	type:uint32
 update	registry.go	46;"	m	access:private	ctype:Registry	language:Go	line:46	signature:(message *Message)
-validateConfig	config.go	70;"	f	access:private	language:Go	line:70	signature:(logger *log.Logger)
+validateConfig	config.go	69;"	f	access:private	language:Go	line:69	signature:(logger *log.Logger)
