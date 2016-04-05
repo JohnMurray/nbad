@@ -42,6 +42,61 @@ __Possible Future Additions__
 
 
 
+## Building / Running
+
+I currently do not have the application pre-built for you or packaged in any distribution-specific
+format. You need to use the old-fashion style of checking out the code and building from source. Luckily
+this project is built fairly easily.
+
+Before running the commands below, make sure you have Go 1.6 installed.
+
+```bash
+git clone https://github.com/JohnMurray/nbad.git
+cd nbad
+
+make setup && make
+```
+
+This will compile the program into a single file `nbad` in the root directory of the project. You
+can then run via
+
+```bash
+./nbad
+```
+
+Or you can review the full set of command line options by passing in the `-h` flag.
+
+```bash
+./nbad -h
+NAME:
+   nbad - NSCA Buffering Agent (daemon) - Emulates NSCA interface as local buffer/proxy
+
+USAGE:
+   nbad [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0
+
+COMMANDS:
+GLOBAL OPTIONS:
+   --config, -c "/etc/nbad/conf.json"	Location of config file on disk
+   --trace, -t				Turn on trace-logging [$NBAD_TRACE]
+   --help, -h				show help
+   --version, -v			print the version
+```
+
+## Configuration
+
+NBAd uses a simple JSON configuration file that is required to run. By default NBAd looks for this configuration file at `/etc/nbad/conf.json`. You can override this with the `-c` (`--config`) flag.
+
+The configuration options are
+
+Value|Type|Description
+-----|----|-----------
+gateway_message_buffer_size|unsigned int|The number of messages to buffer in memory for the gateway
+message_cache_ttl_in_seconds|unsigned int|The time before a message expires (possibly causing upstream state changes)
+message_init_buffer_ttl_in_seconds|unsigned int|The amount of time a message is buffered before actioned upon
+
 
 ## Testing / Debugging
 
@@ -84,9 +139,10 @@ work with non-ascii data, so... on you're own there.
 
 ## TODO
 
-+ Enable debug and trace logging from the command line
-  + Review logging to ensure completeness and proper log levels
-+ Mimic nsca server better / more
-  + Implement CRC
-  + return initialization packet with IV and Timestamp in initial server connect
-+ Flush messages on some cache interval (to avoid transient error conditions)
+[ ] Enable debug and trace logging from the command line
+  [ ] Review logging to ensure completeness and proper log levels
+[ ] Mimic nsca server better / more
+  [ ] Implement CRC
+  [ ] return initialization packet with IV and Timestamp in initial server connect
+[ ] Flush messages on some cache interval (to avoid transient error conditions)
+[ ] HTTP / RESTful interface

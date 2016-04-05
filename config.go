@@ -26,7 +26,7 @@ type NbadConfig struct {
 	// MessageInitBufferTimeSeconds - The amount of time a message is buffered before actioned upon
 	MessageInitBufferTimeSeconds uint32 `json:"message_init_buffer_ttl_in_seconds"`
 
-	// TraceLogging - Enable trace logging (for debugging purposes)
+	// TraceLogging - Enable trace logging (for debugging purposes) (not in JSON config file)
 	TraceLogging bool
 }
 
@@ -51,7 +51,6 @@ func InitConfig(configFile string, logger *log.Logger) {
 func loadConfigFile(confFile string, logger *log.Logger) {
 	logger.Printf("Loading config from file '%s'\n", confFile)
 
-	// TODO make this file configurable via command line
 	file, err := os.Open(confFile)
 	if err != nil {
 		logger.Fatalf("could not load config file '%s': %v\n", confFile, err)
