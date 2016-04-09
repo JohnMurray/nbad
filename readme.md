@@ -145,5 +145,5 @@ work with non-ascii data, so... on you're own there.
   + [ ] Implement CRC
   + [ ] return initialization packet with IV and Timestamp in initial server connect
 + [x] Flush messages on some cache interval (to avoid transient error conditions)
-+ [ ] Flap detection / alerting
++ [ ] Flap detection / alerting - https://github.com/dgryski/go-timewindow
 + [ ] HTTP / RESTful interface
