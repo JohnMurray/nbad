@@ -1,9 +1,9 @@
-package main
+package flapper
 
 import (
 	"time"
 
-	"github.com/johnmurray/nbad/timewindow"
+	"nbad/timewindow"
 )
 
 // Flapper is a simple struct for watching for services that are in a flapState
