@@ -15,6 +15,8 @@ package main
 import (
 	"sync"
 	"time"
+
+	"github.com/JohnMurray/nbad/flapper"
 )
 
 // Gateway is where all the messages flow through
@@ -48,6 +50,8 @@ func (g *Gateway) run() {
 
 // handleIncomingEvents - listen for incoming events and dispatch them to the appropriate handling code
 func (g *Gateway) handleIncomingEvents() {
+	_flapper := flapper.NewFlapper(1, 2)
+	_flapper.NoteStateChange("test")
 	tick := time.Tick(100 * time.Millisecond)
 	for {
 		select {

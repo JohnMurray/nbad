@@ -7,6 +7,7 @@ test: compile
 	@echo
 	@echo "[running tests]"
 	@go test ./timewindow
+	@go test ./flapper
 	@go test .
 
 compile:

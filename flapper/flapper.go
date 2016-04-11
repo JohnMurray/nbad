@@ -3,7 +3,7 @@ package flapper
 import (
 	"time"
 
-	"nbad/timewindow"
+	"github.com/JohnMurray/nbad/timewindow"
 )
 
 // Flapper is a simple struct for watching for services that are in a flapState
@@ -18,7 +18,7 @@ type Flapper struct {
 	services map[string]*timewindow.Window
 }
 
-func newFlapper(max int, duration int) *Flapper {
+func NewFlapper(max int, duration int) *Flapper {
 	f := &Flapper{
 		max:      max,
 		duration: duration,
@@ -31,7 +31,7 @@ func newFlapper(max int, duration int) *Flapper {
  * Increment the counter for a service (or create a counter for the service if one has not
  * alredy been created). (Lazily create services).
  */
-func (f *Flapper) noteStateChange(service string) {
+func (f *Flapper) NoteStateChange(service string) {
 	if state, ok := f.services[service]; ok {
 		state.Add(time.Now().Unix(), 1)
 	} else {
@@ -47,7 +47,7 @@ func (f *Flapper) noteStateChange(service string) {
  * service   - the service to check against
  * recompute - bool flag to recompute the time-window if it has not been updated in a while
  */
-func (f *Flapper) isFlapping(service string, recompute bool) bool {
+func (f *Flapper) IsFlapping(service string, recompute bool) bool {
 	if state, ok := f.services[service]; ok {
 		if recompute {
 			state.Add(time.Now().Unix(), 0)
@@ -62,7 +62,7 @@ func (f *Flapper) isFlapping(service string, recompute bool) bool {
  * services that do not have any data. Compaction allows us to compress our internal data-structures
  * and potentially free up memory.
  */
-func (f *Flapper) compact() {
+func (f *Flapper) Compact() {
 	for service, counter := range f.services {
 		if counter.Total() == 0 {
 			delete(f.services, service)
