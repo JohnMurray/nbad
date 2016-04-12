@@ -110,6 +110,7 @@ func handleIncomingConn(conn net.Conn, messageChannel chan *GatewayEvent) {
 		Logger().Trace.Printf("Processing message: %v\n", message)
 		messageChannel <- newMessageEvent(message)
 	}
+	conn.Close()
 }
 
 // Starts a gateway process. Returns a channel to send new messages to the gateway.

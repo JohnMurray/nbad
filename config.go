@@ -18,13 +18,18 @@ import (
 // NbadConfig is just the struct that holds all of the config values
 type NbadConfig struct {
 	// GatewayMessageBufferSize - The number of messages to buffer in memory for the gateway
-	GatewayMessageBufferSize uint32 `json:"gateway_message_buffer_size"`
+	GatewayMessageBufferSize uint `json:"gateway_message_buffer_size"`
 
 	// MessageCacheTTLInSeconds - The time before a message expires (possibly causing reset of upstream state)
-	MessageCacheTTLInSeconds uint32 `json:"message_cache_ttl_in_seconds"`
+	MessageCacheTTLInSeconds uint `json:"message_cache_ttl_in_seconds"`
 
 	// MessageInitBufferTimeSeconds - The amount of time a message is buffered before actioned upon
-	MessageInitBufferTimeSeconds uint32 `json:"message_init_buffer_ttl_in_seconds"`
+	MessageInitBufferTimeSeconds uint `json:"message_init_buffer_ttl_in_seconds"`
+
+	// FlapCountThreshold - The max number of state-transitions a service can have that can happen within a time-window before considered 'flapping'
+	FlapCountThreshold uint `json:"flap_count_threshold"`
+
+	// TODO: add the flap timewindow back in (do we need it, or is init-buffer-time sufficient?)
 
 	// TraceLogging - Enable trace logging (for debugging purposes) (not in JSON config file)
 	TraceLogging bool

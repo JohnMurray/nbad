@@ -27,7 +27,7 @@ func TestCheckStateForNonExistantService(t *testing.T) {
 func TestSimpleFlapDetection(t *testing.T) {
 	flapper := NewFlapper(5, 30)
 
-	for i := 0; i < flapper.max; i++ {
+	for i := uint(0); i < flapper.max; i++ {
 		flapper.NoteStateChange("test")
 	}
 
@@ -39,7 +39,7 @@ func TestSimpleFlapDetection(t *testing.T) {
 func TestSpacedFlapDetection(t *testing.T) {
 	flapper := NewFlapper(10, 10)
 
-	for i := 0; i < flapper.max; i++ {
+	for i := uint(0); i < flapper.max; i++ {
 		flapper.NoteStateChange("test")
 		time.Sleep(500 * time.Millisecond)
 	}
@@ -52,8 +52,8 @@ func TestSpacedFlapDetection(t *testing.T) {
 func TestFlapDetectionResetsOnSlidingOneSecondWindows(t *testing.T) {
 	flapper := NewFlapper(10, 2)
 
-	for i := 0; i < flapper.max; i++ {
-		if i == (flapper.max / 2) {
+	for i := uint(0); i < flapper.max; i++ {
+		if i == (flapper.max / uint(2)) {
 			time.Sleep(1 * time.Second)
 		}
 		flapper.NoteStateChange("test")

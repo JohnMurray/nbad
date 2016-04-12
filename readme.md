@@ -139,11 +139,19 @@ work with non-ascii data, so... on you're own there.
 
 ## TODO
 
-+ [x] Enable debug and trace logging from the command line
++ [ ] Logging
+  + [x] Enable debug and trace logging from the command line
   + [ ] Review logging to ensure completeness and proper log levels
 + [ ] Mimic nsca server better / more
   + [ ] Implement CRC
   + [ ] return initialization packet with IV and Timestamp in initial server connect
+  + [ ] implement encryption support? (TBD)
++ [ ] Upstream push
 + [x] Flush messages on some cache interval (to avoid transient error conditions)
-+ [ ] Flap detection / alerting - https://github.com/dgryski/go-timewindow
++ [x] Flap detection / alerting
 + [ ] HTTP / RESTful interface
++ [ ] Testing
+  + [ ] flap detection
+  + [ ] init-buffer TTL
+  + [ ] state-expiration
+  + [ ] message parsing & CRC validation
