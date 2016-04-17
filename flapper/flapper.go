@@ -1,3 +1,4 @@
+// Package flapper contains simple mechanism / counter for tracking state changes and detecting potential 'flapping'
 package flapper
 
 import (
