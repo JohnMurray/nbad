@@ -7,4 +7,4 @@ go:
 install: make get-deps
 
 # TravisCI test command
-script: make clean-compile
+script: make clean-test

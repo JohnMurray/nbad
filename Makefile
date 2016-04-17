@@ -1,7 +1,14 @@
 BUILD_OPTS=-p 4 -race
 BIN_NAME=nbad
 
-default: compile
+default: test
+
+test: compile
+	@echo
+	@echo "[running tests]"
+	@go test ./timewindow
+	@go test ./flapper
+	@go test .
 
 compile:
 	go build $(BUILD_OPTS) -o $(BIN_NAME)
@@ -22,3 +29,6 @@ get-deps:
 
 clean-compile: BUILD_OPTS += -a
 clean-compile: compile
+
+clean-test: BUILD_OPTS += -a
+clean-test: test

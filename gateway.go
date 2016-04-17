@@ -10,6 +10,11 @@ package main
  *  - NSCA message received from client
  *  - StateExpiry event received from registry
  *  - InitBufferExpiry event received from registry
+ *
+ * The first event comes direclty from the client and by us listening to a socket. This results
+ * in a message being stored in the registry. The other two messages are both expiry events.
+ * These events are raised by calling 'Gateway.expireOldMessages' and is called via the 'tick'
+ * that runs as part of the gateway's listener code (see 'handleIncomingEvents').
  */
 
 import (
@@ -85,12 +90,30 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		 * can be applied:
 		 *   - if no previous service alert, store
 		 *   - if previous service alert with same state (OK, WARN, etc), discard current message, don't update TTLs
-		 *   - if previous service alert is different, update message and all TTLs
+		 *   - if previous service alert is different:
+		 *     - update flap counter, raise alert if service is flapping
+		 *     - store message, update TTLs
 		 */
-		// TODO ^^ these rules don't actually solve the problem... so... that's lame.  -___-
-		// TODO - Update logic to reflect above description
-		g.registry.update(event.message)
-		Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
+		if message := g.registry.get(event.message.Service); message != nil {
+			if message.State == event.message.State {
+				// same state, discard
+			} else {
+				// different state
+				if f := g.registry.getFlap(event.message.Service); f != nil {
+					f.NoteStateChange(event.message.Service)
+					if f.IsFlapping(event.message.Service, false) {
+						Logger().Info.Printf("PUSH sending state '%s' for flapping service '%s' upstream",
+							stateName(stateCritical), event.message.Service)
+					}
+					g.registry.update(event.message)
+				}
+			}
+		} else {
+			// no previous message, store
+			g.registry.update(event.message)
+			Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
+		}
+
 	} else if event.initBufferExpiry != nil {
 		/*
 		 * All messages are given an initial buffering time. This event is raised when that time is up.

@@ -3,5 +3,9 @@
 
     "message_cache_ttl_in_seconds": 60,
 
-    "message_init_buffer_ttl_in_seconds": 10
+    "message_init_buffer_ttl_in_seconds": 10,
+
+    "flap_count_threshold": 10,
+
+    "flap_time_window_in_seconds": 30
 }
