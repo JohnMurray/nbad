@@ -96,6 +96,7 @@ Value|Type|Description
 gateway_message_buffer_size|unsigned int|The number of messages to buffer in memory for the gateway
 message_cache_ttl_in_seconds|unsigned int|The time before a message expires (possibly causing upstream state changes)
 message_init_buffer_ttl_in_seconds|unsigned int|The amount of time a message is buffered before actioned upon
+flap_count_threshold|unsigned int|The number of state-changes within a time-period before the service is considered 'flapping'
 
 
 ## Testing / Debugging
