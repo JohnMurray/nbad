@@ -4,6 +4,9 @@ import (
 	"net"
 	"os"
 
+	"github.com/JohnMurray/nbad/config"
+	"github.com/JohnMurray/nbad/log"
+	"github.com/JohnMurray/nbad/message"
 	"github.com/codegangsta/cli"
 )
 
@@ -43,8 +46,8 @@ func main() {
 	app.Version = "1.0"
 	app.Action = func(c *cli.Context) {
 		// load configuration
-		InitConfig(configFile, TempLogger("STARTUP"))
-		Config().TraceLogging = trace
+		config.InitConfig(configFile, log.TempLogger("STARTUP"))
+		config.SetTraceLogging(trace)
 
 		startServer()
 	}
@@ -52,16 +55,16 @@ func main() {
 }
 
 func startServer() {
-	Logger().Info.Println("Starting up NBAd")
+	log.Info().Println("Starting up NBAd")
 
 	address := connHost + ":" + connPort
 
 	listener, err := net.Listen(connType, address)
 	if err != nil {
-		Logger().Error.Println("Could not bind to "+address, err.Error())
+		log.Error().Println("Could not bind to "+address, err.Error())
 		os.Exit(errBinding)
 	}
-	Logger().Info.Printf("Listening at %s\n", address)
+	log.Info().Printf("Listening at %s\n", address)
 
 	// close listener on program exit
 	defer listener.Close()
@@ -73,7 +76,7 @@ func startServer() {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			Logger().Error.Println("Error accepting connection", err.Error())
+			log.Error().Println("Error accepting connection", err.Error())
 			// FIXME should we do more than just print out an error here?
 		}
 		go handleIncomingConn(conn, messageChannel)
@@ -91,7 +94,7 @@ func handleIncomingConn(conn net.Conn, messageChannel chan *GatewayEvent) {
 	// Read the incoming connection into the buffer.
 	n, err := conn.Read(buf)
 	if err != nil {
-		Logger().Warning.Println("Error reading incoming request", err.Error())
+		log.Warning().Println("Error reading incoming request", err.Error())
 		return
 	}
 
@@ -99,15 +102,15 @@ func handleIncomingConn(conn net.Conn, messageChannel chan *GatewayEvent) {
 	if n < 1024 {
 		buf = buf[:n]
 	}
-	message, err := parseMessage(buf)
+	message, err := message.ParseMessage(buf)
 
 	// continue down processing pipeline
 	if err != nil {
-		Logger().Warning.Println("Failed to parse message", err.Error())
+		log.Warning().Println("Failed to parse message", err.Error())
 		// TODO: determine how to send proper error response
 		conn.Write([]byte("Message could not be processed."))
 	} else {
-		Logger().Trace.Printf("Processing message: %v\n", message)
+		log.Trace().Printf("Processing message: %v\n", message)
 		messageChannel <- newMessageEvent(message)
 	}
 	conn.Close()
@@ -116,12 +119,12 @@ func handleIncomingConn(conn net.Conn, messageChannel chan *GatewayEvent) {
 // Starts a gateway process. Returns a channel to send new messages to the gateway.
 func startGateway() chan *GatewayEvent {
 	// channel for sending new messages to the Gateway
-	gatewayChan := make(chan *GatewayEvent, Config().GatewayMessageBufferSize)
+	gatewayChan := make(chan *GatewayEvent, config.GatewayMessageBufferSize())
 
 	registry := &Registry{
 		cache:                  make(map[string]*MessageEntry),
-		ttlInSeconds:           Config().MessageCacheTTLInSeconds,
-		initBufferTTLInSeconds: Config().MessageInitBufferTimeSeconds,
+		ttlInSeconds:           config.MessageCacheTTLInSeconds(),
+		initBufferTTLInSeconds: config.MessageInitBufferTimeSeconds(),
 	}
 	gateway := newGateway(registry, gatewayChan)
 
@@ -130,6 +133,6 @@ func startGateway() chan *GatewayEvent {
 	return gatewayChan
 }
 
-func newMessageEvent(m *Message) *GatewayEvent {
+func newMessageEvent(m *message.Message) *GatewayEvent {
 	return &GatewayEvent{message: m}
 }

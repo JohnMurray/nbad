@@ -1,4 +1,5 @@
-package main
+// Package log makes logging within the system simple
+package log
 
 /**
  * File: log.go
@@ -21,25 +22,45 @@ import (
 	"log"
 	"os"
 	"sync"
+
+	"github.com/JohnMurray/nbad/config"
 )
 
-var _loggers MyLoggers
+var _loggers myLoggers
 var once sync.Once
 
-// MyLoggers is a simple log container for my application
-type MyLoggers struct {
+type myLoggers struct {
 	Trace   *log.Logger
 	Info    *log.Logger
 	Warning *log.Logger
 	Error   *log.Logger
 }
 
-// Logger returns a custom set of loggers
-func Logger() MyLoggers {
+func logger() myLoggers {
 	once.Do(func() {
 		initLoggers()
 	})
 	return _loggers
+}
+
+// Trace returns a trace-level logger
+func Trace() *log.Logger {
+	return logger().Trace
+}
+
+// Info returns an info-level logger
+func Info() *log.Logger {
+	return logger().Info
+}
+
+// Warning returns a warning-level logger
+func Warning() *log.Logger {
+	return logger().Warning
+}
+
+// Error returns a error-level logger
+func Error() *log.Logger {
+	return logger().Error
 }
 
 func initLoggers() {
@@ -50,7 +71,7 @@ func initLoggers() {
 	var traceHandle io.Writer
 	var logFormat int
 
-	if Config().TraceLogging {
+	if config.TraceLogging() {
 		traceHandle = os.Stderr
 		logFormat = log.Ldate | log.Ltime | log.Lshortfile
 	} else {
@@ -58,7 +79,7 @@ func initLoggers() {
 		logFormat = log.Ldate | log.Ltime
 	}
 
-	_loggers = MyLoggers{
+	_loggers = myLoggers{
 		Trace:   log.New(traceHandle, "TRACE: ", logFormat),
 		Info:    log.New(infoHandle, "INFO: ", logFormat),
 		Warning: log.New(warningHandle, "WARNING: ", logFormat),

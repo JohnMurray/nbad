@@ -1,4 +1,5 @@
-package main
+// Package config is a package for making loading and accessing configurations for nbad easy
+package config
 
 /**
  * File: config.go
@@ -38,9 +39,24 @@ type NbadConfig struct {
 var configLoadOnce sync.Once
 var nbadConfig *NbadConfig
 
-// Config returns the current config file
-func Config() *NbadConfig {
-	return nbadConfig
+// GatewayMessageBufferSize - NbadConfig.GatewayMessageBufferSize
+func GatewayMessageBufferSize() uint { return nbadConfig.GatewayMessageBufferSize }
+
+// MessageCacheTTLInSeconds - NbadConfig.MessageCacheTTLInSeconds
+func MessageCacheTTLInSeconds() uint { return nbadConfig.MessageCacheTTLInSeconds }
+
+// MessageInitBufferTimeSeconds - NbadConfig.MessageInitBufferTimeSeconds
+func MessageInitBufferTimeSeconds() uint { return nbadConfig.MessageInitBufferTimeSeconds }
+
+// FlapCountThreshold - NbadConfig.FlapCountThreshold
+func FlapCountThreshold() uint { return nbadConfig.FlapCountThreshold }
+
+// TraceLogging - NbadConfig.TraceLogging
+func TraceLogging() bool { return nbadConfig.TraceLogging }
+
+// SetTraceLogging - Set the TraceLogging value in the global config
+func SetTraceLogging(trace bool) {
+	nbadConfig.TraceLogging = trace
 }
 
 // InitConfig - loads the config file

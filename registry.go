@@ -13,7 +13,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/JohnMurray/nbad/config"
 	"github.com/JohnMurray/nbad/flapper"
+	"github.com/JohnMurray/nbad/message"
 )
 
 // Registry is just a fancy cache with a TTL
@@ -30,15 +32,15 @@ type Registry struct {
 
 // MessageEntry is something to store in the Registry
 type MessageEntry struct {
-	message            *Message
-	prevMessage        *Message
+	message            *message.Message
+	prevMessage        *message.Message
 	initBufferExpireAt time.Time
 	expireAt           time.Time
 	flap               *flapper.Flapper
 }
 
 // Contains checks to see if the message is currently in the registry.
-func (r *Registry) contains(message *Message) bool {
+func (r *Registry) contains(message *message.Message) bool {
 	if _, ok := r.cache[message.Service]; ok {
 		return true
 	}
@@ -46,12 +48,12 @@ func (r *Registry) contains(message *Message) bool {
 }
 
 // Update stores message in the registry or updates it if it's already there
-func (r *Registry) update(message *Message) {
+func (r *Registry) update(message *message.Message) {
 	me := &MessageEntry{
 		message:            message,
 		expireAt:           time.Now().Add(time.Duration(r.ttlInSeconds) * time.Second),
-		initBufferExpireAt: time.Now().Add(time.Duration(Config().MessageInitBufferTimeSeconds) * time.Second),
-		flap:               flapper.NewFlapper(Config().FlapCountThreshold, Config().MessageInitBufferTimeSeconds),
+		initBufferExpireAt: time.Now().Add(time.Duration(config.MessageInitBufferTimeSeconds()) * time.Second),
+		flap:               flapper.NewFlapper(config.FlapCountThreshold(), config.MessageInitBufferTimeSeconds()),
 	}
 	if prev := r.get(message.Service); prev != nil {
 		me.prevMessage = prev
@@ -59,14 +61,14 @@ func (r *Registry) update(message *Message) {
 	r.cache[message.Service] = me
 }
 
-func (r *Registry) get(key string) *Message {
+func (r *Registry) get(key string) *message.Message {
 	if ce, ok := r.cache[key]; ok {
 		return ce.message
 	}
 	return nil
 }
 
-func (r *Registry) getPrev(key string) *Message {
+func (r *Registry) getPrev(key string) *message.Message {
 	if ce, ok := r.cache[key]; ok {
 		return ce.prevMessage
 	}
@@ -83,7 +85,7 @@ func (r *Registry) getFlap(key string) *flapper.Flapper {
 func (r *Registry) summaryString() string {
 	s := ""
 	for k, v := range r.cache {
-		entry := fmt.Sprintf("\t%s | %s | %s\n", k, stateName(v.message.State), v.message.Message)
+		entry := fmt.Sprintf("\t%s | %s | %s\n", k, message.StateName(v.message.State), v.message.Message)
 		s = s + entry
 	}
 	return s

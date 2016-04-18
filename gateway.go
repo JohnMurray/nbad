@@ -20,6 +20,9 @@ package main
 import (
 	"sync"
 	"time"
+
+	"github.com/JohnMurray/nbad/log"
+	"github.com/JohnMurray/nbad/message"
 )
 
 // Gateway is where all the messages flow through
@@ -31,7 +34,7 @@ type Gateway struct {
 
 // GatewayEvent represents union of events a Gateway expects to receive
 type GatewayEvent struct {
-	message          *Message
+	message          *message.Message
 	stateExpiry      *StateExpiry
 	initBufferExpiry *InitBufferExpiry
 }
@@ -94,16 +97,16 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		 *     - update flap counter, raise alert if service is flapping
 		 *     - store message, update TTLs
 		 */
-		if message := g.registry.get(event.message.Service); message != nil {
-			if message.State == event.message.State {
+		if msg := g.registry.get(event.message.Service); msg != nil {
+			if msg.State == event.message.State {
 				// same state, discard
 			} else {
 				// different state
 				if f := g.registry.getFlap(event.message.Service); f != nil {
 					f.NoteStateChange(event.message.Service)
 					if f.IsFlapping(event.message.Service, false) {
-						Logger().Info.Printf("PUSH sending state '%s' for flapping service '%s' upstream",
-							stateName(stateCritical), event.message.Service)
+						log.Info().Printf("PUSH sending state '%s' for flapping service '%s' upstream",
+							message.StateName(message.StateCritical), event.message.Service)
 					}
 					g.registry.update(event.message)
 				}
@@ -111,7 +114,7 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		} else {
 			// no previous message, store
 			g.registry.update(event.message)
-			Logger().Trace.Printf("registry:\n%s\n", g.registry.summaryString())
+			log.Trace().Printf("registry:\n%s\n", g.registry.summaryString())
 		}
 
 	} else if event.initBufferExpiry != nil {
@@ -122,15 +125,15 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		 *   - if previous state is the same, do nothing
 		 *   - if previous state does not exist (expired or new), proxy
 		 */
-		if message := g.registry.get(event.initBufferExpiry.service); message != nil {
+		if msg := g.registry.get(event.initBufferExpiry.service); msg != nil {
 			if previous := g.registry.getPrev(event.initBufferExpiry.service); previous != nil {
-				if message.State != previous.State {
-					Logger().Info.Printf("detected state change from %s to %s for service %s",
-						stateName(previous.State), stateName(message.State), message.Service)
+				if msg.State != previous.State {
+					log.Info().Printf("detected state change from %s to %s for service %s",
+						message.StateName(previous.State), message.StateName(msg.State), msg.Service)
 				}
 			} else {
-				Logger().Info.Printf("new state of %s for service %s, sending upstream",
-					stateName(message.State), message.Service)
+				log.Info().Printf("new state of %s for service %s, sending upstream",
+					message.StateName(msg.State), msg.Service)
 			}
 		}
 	} else if event.stateExpiry != nil {
@@ -142,17 +145,17 @@ func (g *Gateway) handleMessageStateChange(event *GatewayEvent) {
 		 *
 		 * A non-error state is defined as OK here.
 		 */
-		if message := g.registry.get(event.stateExpiry.service); message != nil {
-			Logger().Info.Printf("expired message: %v with state %s\n", message, stateName(message.State))
-			switch message.State {
-			case stateOk: // do nothing
-			case stateWarning:
+		if msg := g.registry.get(event.stateExpiry.service); msg != nil {
+			log.Info().Printf("expired message: %v with state %s\n", msg, message.StateName(msg.State))
+			switch msg.State {
+			case message.StateOk: // do nothing
+			case message.StateWarning:
 				fallthrough
-			case stateCritical:
-				Logger().Info.Printf("PUSH Sending state '%s' for expired service '%s' upstream",
-					stateName(stateOk), message.Service)
+			case message.StateCritical:
+				log.Info().Printf("PUSH Sending state '%s' for expired service '%s' upstream",
+					message.StateName(message.StateOk), msg.Service)
 			default:
-				Logger().Trace.Println("Expired message in UNKNOWN state")
+				log.Trace().Println("Expired message in UNKNOWN state")
 			}
 		}
 	}

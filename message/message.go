@@ -1,25 +1,23 @@
-package main
-
-/**
- * File: message.go
- *
- * This file contains functions related to parsing and processing messages
- * incoming from the client. Sending messages upstream is handled by another
- * library that is much more complete in it's ability to _compose_ messages.
- * However since decomposing messages is usually a server-side thing, we have
- * our own message stuffs here.
- */
+// Package message provides message parsing and serializing
+package message
 
 import (
 	"encoding/binary"
 	"fmt"
+	"hash/crc32"
+
+	"github.com/JohnMurray/nbad/log"
 )
 
 const (
-	stateOk = iota
-	stateWarning
-	stateCritical
-	stateUnknown
+	// StateOk OK state for Nagios
+	StateOk = iota
+	// StateWarning WARN state for Nagios
+	StateWarning
+	// StateCritical CRIT state for Nagios
+	StateCritical
+	// StateUnknown  state for Nagios
+	StateUnknown
 
 	nagiosMessageLen = 720
 )
@@ -39,7 +37,7 @@ type Message struct {
 }
 
 // ParseMessage parses byte arrays to Nagios Message v3 spec (or as close as I can get)
-func parseMessage(bytes []byte) (*Message, error) {
+func ParseMessage(bytes []byte) (*Message, error) {
 	if len(bytes) >= 2 {
 		version := binary.BigEndian.Uint16(bytes[:2])
 		if version != 3 {
@@ -53,8 +51,16 @@ func parseMessage(bytes []byte) (*Message, error) {
 	}
 
 	// discard CRC for now. not sure what to do with it just yet
-	// TODO: figure out the right way to validate this
-	binary.BigEndian.Uint32(bytes[4:8])
+	crc := binary.BigEndian.Uint32(bytes[4:8])
+	for i := 4; i <= 8; i++ {
+		bytes[i] = 0
+	}
+	// only validate if a CRC is provided
+	if crc != 0 {
+		if valid, calcCrc := validateCrc(bytes, crc); !valid {
+			return nil, fmt.Errorf("CRC validation failed. Given %d, but calculated %d", crc, calcCrc)
+		}
+	}
 
 	// read the timestamp
 	timestamp := binary.BigEndian.Uint32(bytes[8:12])
@@ -62,12 +68,12 @@ func parseMessage(bytes []byte) (*Message, error) {
 
 	// read the return-code (state)
 	returnCode := binary.BigEndian.Uint16(bytes[12:14])
-	if returnCode != stateOk &&
-		returnCode != stateWarning &&
-		returnCode != stateCritical &&
-		returnCode != stateUnknown {
+	if returnCode != StateOk &&
+		returnCode != StateWarning &&
+		returnCode != StateCritical &&
+		returnCode != StateUnknown {
 
-		Logger().Trace.Printf("Unknown return code received %d", returnCode)
+		log.Trace().Printf("Unknown return code received %d", returnCode)
 		return nil, fmt.Errorf("Unknown return code received %d", returnCode)
 	}
 
@@ -91,13 +97,19 @@ func parseMessage(bytes []byte) (*Message, error) {
 	}, nil
 }
 
-func stateName(state uint16) string {
+func validateCrc(message []byte, crc uint32) (bool, uint32) {
+	calcCrc := crc32.ChecksumIEEE(message)
+	return calcCrc == crc, calcCrc
+}
+
+// StateName returns a string-representation of state
+func StateName(state uint16) string {
 	switch state {
-	case stateOk:
+	case StateOk:
 		return "OK"
-	case stateWarning:
+	case StateWarning:
 		return "WARNING"
-	case stateCritical:
+	case StateCritical:
 		return "CRITICAL"
 	default:
 		return "UNKNOWN"
