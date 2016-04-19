@@ -6,9 +6,7 @@ default: test
 test: compile
 	@echo
 	@echo "[running tests]"
-	@go test ./timewindow
-	@go test ./flapper
-	@go test .
+	@go test -p 4 ./...
 
 compile:
 	go build $(BUILD_OPTS) -o $(BIN_NAME)

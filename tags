@@ -35,18 +35,20 @@ NewFlapper	flapper/flapper.go	23;"	f	access:public	ctype:Flapper	language:Go	lin
 NoteStateChange	flapper/flapper.go	35;"	m	access:public	ctype:Flapper	language:Go	line:35	signature:(service string)
 ParseMessage	message/message.go	40;"	f	access:public	ctype:Message	language:Go	line:40	signature:(bytes []byte)	type:*Message, error
 Registry	registry.go	22;"	t	access:public	language:Go	line:22	type:struct
+SerializeMessage	message/message.go	101;"	f	access:public	language:Go	line:101	signature:(msg *Message)	type:[]byte, error
 Service	message/message.go	34;"	w	access:public	ctype:Message	language:Go	line:34	type:string
 SetTraceLogging	config/config.go	58;"	f	access:public	language:Go	line:58	signature:(trace bool)
 State	message/message.go	30;"	w	access:public	ctype:Message	language:Go	line:30	type:uint16
 StateCritical	message/message.go	18;"	c	access:public	language:Go	line:18
 StateExpiry	gateway.go	43;"	t	access:public	language:Go	line:43	type:struct
-StateName	message/message.go	106;"	f	access:public	language:Go	line:106	signature:(state uint16)	type:string
+StateName	message/message.go	111;"	f	access:public	language:Go	line:111	signature:(state uint16)	type:string
 StateOk	message/message.go	14;"	c	access:public	language:Go	line:14
 StateUnknown	message/message.go	20;"	c	access:public	language:Go	line:20
 StateWarning	message/message.go	16;"	c	access:public	language:Go	line:16
 TempLogger	log/log.go	91;"	f	access:public	language:Go	line:91	signature:(level string)	type:*log.Logger
 TestAddStateChange	flapper/flapper_test.go	8;"	f	access:public	language:Go	line:8	signature:(t *testing.T)
 TestCheckStateForNonExistantService	flapper/flapper_test.go	19;"	f	access:public	language:Go	line:19	signature:(t *testing.T)
+TestEmptyCrc	message/message_test.go	7;"	f	access:public	language:Go	line:7	signature:(t *testing.T)
 TestFlapDetectionResetsOnSlidingOneSecondWindows	flapper/flapper_test.go	52;"	f	access:public	language:Go	line:52	signature:(t *testing.T)
 TestSimpleFlapDetection	flapper/flapper_test.go	27;"	f	access:public	language:Go	line:27	signature:(t *testing.T)
 TestSpacedFlapDetection	flapper/flapper_test.go	39;"	f	access:public	language:Go	line:39	signature:(t *testing.T)
@@ -122,6 +124,7 @@ main	registry.go	1;"	p	language:Go	line:1
 max	flapper/flapper.go	13;"	w	access:private	ctype:Flapper	language:Go	line:13	type:uint
 message	gateway.go	37;"	w	access:private	ctype:GatewayEvent	language:Go	line:37	type:*message.Message
 message	message/message.go	2;"	p	language:Go	line:2
+message	message/message_test.go	1;"	p	language:Go	line:1
 message	registry.go	35;"	w	access:private	ctype:MessageEntry	language:Go	line:35	type:*message.Message
 myLoggers	log/log.go	32;"	t	access:private	language:Go	line:32	type:struct
 nagiosMessageLen	message/message.go	22;"	c	access:private	language:Go	line:22
@@ -149,6 +152,7 @@ sync	gateway.go	21;"	i	language:Go	line:21
 sync	log/log.go	24;"	i	language:Go	line:24
 tailIdx	timewindow/timewindow.go	31;"	w	access:private	ctype:Window	language:Go	line:31	type:int
 testing	flapper/flapper_test.go	4;"	i	language:Go	line:4
+testing	message/message_test.go	4;"	i	language:Go	line:4
 testing	timewindow/timewindow_test.go	4;"	i	language:Go	line:4
 time	flapper/flapper.go	5;"	i	language:Go	line:5
 time	flapper/flapper_test.go	5;"	i	language:Go	line:5
@@ -160,4 +164,4 @@ total	timewindow/timewindow.go	32;"	w	access:private	ctype:Window	language:Go	li
 ttlInSeconds	registry.go	27;"	w	access:private	ctype:Registry	language:Go	line:27	type:uint
 update	registry.go	51;"	m	access:private	ctype:Registry	language:Go	line:51	signature:(message *message.Message)
 validateConfig	config/config.go	90;"	f	access:private	language:Go	line:90	signature:(logger *log.Logger)
-validateCrc	message/message.go	100;"	f	access:private	language:Go	line:100	signature:(message []byte, crc uint32)	type:bool, uint32
+validateCrc	message/message.go	105;"	f	access:private	language:Go	line:105	signature:(message []byte, crc uint32)	type:bool, uint32

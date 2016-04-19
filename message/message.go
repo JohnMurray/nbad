@@ -64,7 +64,7 @@ func ParseMessage(bytes []byte) (*Message, error) {
 
 	// read the timestamp
 	timestamp := binary.BigEndian.Uint32(bytes[8:12])
-	// TODO: validate timestamp as semi-current ?? (maybe?)
+	// TODO: validate timestamp as semi-current ?it? (maybe?)
 
 	// read the return-code (state)
 	returnCode := binary.BigEndian.Uint16(bytes[12:14])
@@ -95,6 +95,11 @@ func ParseMessage(bytes []byte) (*Message, error) {
 		Service:   service,
 		Message:   description,
 	}, nil
+}
+
+// SerializeMessage - Turns a message into an array of bytes
+func SerializeMessage(msg *Message) ([]byte, error) {
+	return nil, nil
 }
 
 func validateCrc(message []byte, crc uint32) (bool, uint32) {
