@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/JohnMurray/nbad/config"
@@ -49,9 +51,17 @@ func main() {
 		config.InitConfig(configFile, log.TempLogger("STARTUP"))
 		config.SetTraceLogging(trace)
 
+		startHTTPServer()
 		startServer()
 	}
 	app.Run(os.Args)
+}
+
+func startHTTPServer() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "hello")
+	})
+	http.ListenAndServe(":9876", nil)
 }
 
 func startServer() {

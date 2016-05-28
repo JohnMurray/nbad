@@ -66,41 +66,42 @@ _loggers	log/log.go	29;"	v	access:private	language:Go	line:29	type:myLoggers
 cache	registry.go	24;"	w	access:private	ctype:Registry	language:Go	line:24	type:map[string]*MessageEntry
 config	config/config.go	2;"	p	language:Go	line:2
 configLoadOnce	config/config.go	39;"	v	access:private	language:Go	line:39	type:sync.Once
-connHost	main.go	15;"	c	access:private	language:Go	line:15
-connPort	main.go	16;"	c	access:private	language:Go	line:16
-connType	main.go	14;"	c	access:private	language:Go	line:14
+connHost	main.go	17;"	c	access:private	language:Go	line:17
+connPort	main.go	18;"	c	access:private	language:Go	line:18
+connType	main.go	16;"	c	access:private	language:Go	line:16
 contains	registry.go	43;"	m	access:private	ctype:Registry	language:Go	line:43	signature:(message *message.Message)	type:bool
 counts	timewindow/timewindow.go	28;"	w	access:private	ctype:Window	language:Go	line:28	type:[]int
-defaultConfLocation	main.go	18;"	c	access:private	language:Go	line:18
+defaultConfLocation	main.go	20;"	c	access:private	language:Go	line:20
 duration	flapper/flapper.go	16;"	w	access:private	ctype:Flapper	language:Go	line:16	type:uint
 encoding/binary	message/message.go	5;"	i	language:Go	line:5
 encoding/json	config/config.go	13;"	i	language:Go	line:13
 epoch	timewindow/timewindow.go	29;"	w	access:private	ctype:Window	language:Go	line:29	type:int64
-errAccptIncomingConn	main.go	21;"	c	access:private	language:Go	line:21
-errBinding	main.go	20;"	c	access:private	language:Go	line:20
+errAccptIncomingConn	main.go	23;"	c	access:private	language:Go	line:23
+errBinding	main.go	22;"	c	access:private	language:Go	line:22
 expireAt	registry.go	38;"	w	access:private	ctype:MessageEntry	language:Go	line:38	type:time.Time
 expireOldMessages	gateway.go	74;"	m	access:private	ctype:Gateway	language:Go	line:74	signature:()
 flap	registry.go	39;"	w	access:private	ctype:MessageEntry	language:Go	line:39	type:*flapper.Flapper
 flapper	flapper/flapper.go	2;"	p	language:Go	line:2
 flapper	flapper/flapper_test.go	1;"	p	language:Go	line:1
+fmt	main.go	4;"	i	language:Go	line:4
 fmt	message/message.go	6;"	i	language:Go	line:6
 fmt	registry.go	13;"	i	language:Go	line:13
 get	registry.go	64;"	m	access:private	ctype:Registry	language:Go	line:64	signature:(key string)	type:*message.Message
 getFlap	registry.go	78;"	m	access:private	ctype:Registry	language:Go	line:78	signature:(key string)	type:*flapper.Flapper
 getPrev	registry.go	71;"	m	access:private	ctype:Registry	language:Go	line:71	signature:(key string)	type:*message.Message
 github.com/JohnMurray/nbad/config	log/log.go	26;"	i	language:Go	line:26
-github.com/JohnMurray/nbad/config	main.go	7;"	i	language:Go	line:7
+github.com/JohnMurray/nbad/config	main.go	9;"	i	language:Go	line:9
 github.com/JohnMurray/nbad/config	registry.go	16;"	i	language:Go	line:16
 github.com/JohnMurray/nbad/flapper	registry.go	17;"	i	language:Go	line:17
 github.com/JohnMurray/nbad/log	gateway.go	24;"	i	language:Go	line:24
-github.com/JohnMurray/nbad/log	main.go	8;"	i	language:Go	line:8
+github.com/JohnMurray/nbad/log	main.go	10;"	i	language:Go	line:10
 github.com/JohnMurray/nbad/log	message/message.go	9;"	i	language:Go	line:9
 github.com/JohnMurray/nbad/message	gateway.go	25;"	i	language:Go	line:25
-github.com/JohnMurray/nbad/message	main.go	9;"	i	language:Go	line:9
+github.com/JohnMurray/nbad/message	main.go	11;"	i	language:Go	line:11
 github.com/JohnMurray/nbad/message	registry.go	18;"	i	language:Go	line:18
 github.com/JohnMurray/nbad/timewindow	flapper/flapper.go	7;"	i	language:Go	line:7
-github.com/codegangsta/cli	main.go	10;"	i	language:Go	line:10
-handleIncomingConn	main.go	87;"	f	access:private	language:Go	line:87	signature:(conn net.Conn, messageChannel chan *GatewayEvent)
+github.com/codegangsta/cli	main.go	12;"	i	language:Go	line:12
+handleIncomingConn	main.go	97;"	f	access:private	language:Go	line:97	signature:(conn net.Conn, messageChannel chan *GatewayEvent)
 handleIncomingEvents	gateway.go	58;"	m	access:private	ctype:Gateway	language:Go	line:58	signature:()
 handleMessageStateChange	gateway.go	87;"	m	access:private	ctype:Gateway	language:Go	line:87	signature:(event *GatewayEvent)
 hash/crc32	message/message.go	7;"	i	language:Go	line:7
@@ -119,7 +120,7 @@ log	log/log.go	2;"	p	language:Go	line:2
 logger	log/log.go	39;"	f	access:private	ctype:myLoggers	language:Go	line:39	signature:()	type:myLoggers
 main	gateway.go	1;"	p	language:Go	line:1
 main	main.go	1;"	p	language:Go	line:1
-main	main.go	24;"	f	access:private	language:Go	line:24	signature:()
+main	main.go	26;"	f	access:private	language:Go	line:26	signature:()
 main	registry.go	1;"	p	language:Go	line:1
 max	flapper/flapper.go	13;"	w	access:private	ctype:Flapper	language:Go	line:13	type:uint
 message	gateway.go	37;"	w	access:private	ctype:GatewayEvent	language:Go	line:37	type:*message.Message
@@ -129,22 +130,24 @@ message	registry.go	35;"	w	access:private	ctype:MessageEntry	language:Go	line:35
 myLoggers	log/log.go	32;"	t	access:private	language:Go	line:32	type:struct
 nagiosMessageLen	message/message.go	22;"	c	access:private	language:Go	line:22
 nbadConfig	config/config.go	40;"	v	access:private	language:Go	line:40	type:*NbadConfig
-net	main.go	4;"	i	language:Go	line:4
+net	main.go	5;"	i	language:Go	line:5
+net/http	main.go	6;"	i	language:Go	line:6
 newGateway	gateway.go	164;"	f	access:private	ctype:Gateway	language:Go	line:164	signature:(r *Registry, incomingEventChan chan *GatewayEvent)	type:*Gateway
-newMessageEvent	main.go	136;"	f	access:private	language:Go	line:136	signature:(m *message.Message)	type:*GatewayEvent
+newMessageEvent	main.go	146;"	f	access:private	language:Go	line:146	signature:(m *message.Message)	type:*GatewayEvent
 once	log/log.go	30;"	v	access:private	language:Go	line:30	type:sync.Once
 os	config/config.go	15;"	i	language:Go	line:15
 os	log/log.go	23;"	i	language:Go	line:23
-os	main.go	5;"	i	language:Go	line:5
+os	main.go	7;"	i	language:Go	line:7
 prevMessage	registry.go	36;"	w	access:private	ctype:MessageEntry	language:Go	line:36	type:*message.Message
 registry	gateway.go	30;"	w	access:private	ctype:Gateway	language:Go	line:30	type:*Registry
 run	gateway.go	51;"	m	access:private	ctype:Gateway	language:Go	line:51	signature:()
 service	gateway.go	43;"	w	access:private	ctype:StateExpiry	language:Go	line:43	type:string
 service	gateway.go	46;"	w	access:private	ctype:InitBufferExpiry	language:Go	line:46	type:string
 services	flapper/flapper.go	19;"	w	access:private	ctype:Flapper	language:Go	line:19	type:map[string]*timewindow.Window
-startGateway	main.go	120;"	f	access:private	language:Go	line:120	signature:()	type:chan *GatewayEvent
+startGateway	main.go	130;"	f	access:private	language:Go	line:130	signature:()	type:chan *GatewayEvent
+startHTTPServer	main.go	60;"	f	access:private	language:Go	line:60	signature:()
 startOnce	gateway.go	32;"	w	access:private	ctype:Gateway	language:Go	line:32	type:sync.Once
-startServer	main.go	57;"	f	access:private	language:Go	line:57	signature:()
+startServer	main.go	67;"	f	access:private	language:Go	line:67	signature:()
 stateExpiry	gateway.go	38;"	w	access:private	ctype:GatewayEvent	language:Go	line:38	type:*StateExpiry
 summaryString	registry.go	85;"	m	access:private	ctype:Registry	language:Go	line:85	signature:()	type:string
 sync	config/config.go	16;"	i	language:Go	line:16
